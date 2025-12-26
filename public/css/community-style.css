@@ -1,0 +1,184 @@
+/* Global Font & Body */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #ffffff;
+}
+
+/* === NAVBAR STYLING === */
+.navbar {
+    box-shadow: none; /* Menghapus shadow jika ada */
+    /* border-bottom: 1px solid #eee; <-- HAPUS BARIS INI JIKA ADA */
+}
+
+.navbar-nav .nav-link {
+    color: #000000; /* Hitam sesuai request */
+    font-weight: 400; /* Regular weight */
+    font-size: 1rem;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #067CC2; /* Biru saat hover */
+}
+
+.navbar-nav .nav-link.text-blue-link {
+    color: #067CC2; /* Link 'Products' di desain teman warnanya biru */
+}
+
+.navbar-nav .nav-link.active {
+    font-weight: 700;
+}
+
+/* Tombol Profile (Pill Shape) */
+.btn-profile {
+    background-color: #fff;
+    border: 1px solid #000000; /* Border hitam tegas */
+    border-radius: 5px; /* Rounded sedikit saja */
+    color: #000000;
+    padding: 8px 16px;
+    min-width: 135px;
+    height: 52px;
+    transition: all 0.2s;
+}
+.btn-profile:hover {
+    background-color: #F9FAFB;
+}
+
+/* === HERO HEADER & BUTTONS === */
+.header-gradient-blue {
+    background: linear-gradient(135deg, #0EA5E9 0%, #2563EB 100%);
+    color: white;
+}
+.header-gradient-blue .btn-outline-light:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Action Bar Biru Muda */
+.create-post-bar {
+    background-color: #EBF8FF; 
+    border: 1px solid #BEE3F8;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+.cursor-pointer { cursor: pointer; }
+.avatar-md { width: 48px; height: 48px; }
+
+/* Tombol Gradient Biru Tua */
+.btn-gradient-blue {
+    background: linear-gradient(90deg, #0EA5E9 0%, #2563EB 100%);
+    border: none; color: white; transition: transform 0.2s;
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.3);
+}
+.btn-gradient-blue:hover {
+    color: white; transform: translateY(-2px);
+    background: linear-gradient(90deg, #0284C7 0%, #1D4ED8 100%);
+}
+
+/* === POST CARDS === */
+.post-card {
+    transition: all 0.3s ease;
+    border: 1px solid #E5E7EB !important;
+    background-color: #ffffff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.post-card:hover {
+    border-color: #93C5FD !important;
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.08);
+}
+.card-title { font-size: 1.35rem; line-height: 1.4; color: #111827; }
+
+.text-bg-dark-custom {
+    background-color: #1F2937 !important; color: #F9FAFB;
+    font-weight: 500; letter-spacing: 0.3px; font-size: 0.75rem;
+    padding-left: 1rem !important; padding-right: 1rem !important;
+}
+
+/* === FOOTER (Gaya Teman + Responsif) === */
+.footer-gradient {
+    background-image: linear-gradient(87.6deg, #FFFFFF 8.86%, rgba(78, 218, 254, 0.67) 32.51%, rgba(6, 124, 194, 0.93) 95.43%);
+    border-top: none;
+    padding-top: 5rem;
+}
+.footer-slogan {
+    font-family: 'Chakra Petch', sans-serif;
+    font-style: italic; font-weight: 500; font-size: 1.1rem; color: #000;
+}
+.footer-title {
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 700; font-size: 1.2rem; color: #000;
+    margin-bottom: 1rem;
+}
+.footer-links a {
+    text-decoration: none; color: #000; font-weight: 400;
+    display: block; margin-bottom: 8px;
+}
+.footer-links a:hover {
+    text-decoration: underline; color: #067CC2;
+}
+
+/* Modal Styling */
+.modal-content {
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    border-radius: 1.5rem !important;
+}
+
+/* Responsif Mobile */
+@media (max-width: 767.98px) {
+    .create-post-bar { flex-direction: column; align-items: stretch !important; gap: 1rem; }
+    .create-post-bar .btn { width: 100%; }
+    .col-md-9 { min-height: auto !important; }
+}
+
+/* ===========================================
+   STYLE KHUSUS HALAMAN POST DETAIL / PROMO
+   =========================================== */
+
+/* Hero Banner Biru Gradien Besar */
+.promo-hero {
+    /* Gradien Biru Muda (Kiri) ke Biru Tua Gelap (Kanan) sesuai screenshot */
+    background: linear-gradient(90deg, #8FD3F4 0%, #023E8A 100%); 
+    height: 400px; /* Tinggi banner */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Tombol di Banner */
+.btn-cyan {
+    background-color: #4DD0E1; /* Warna Cyan terang */
+    color: white;
+    border: none;
+    transition: .2s;
+}
+.btn-cyan:hover { background-color: #26C6DA; color: white; }
+
+.btn-royal {
+    background-color: #2962FF; /* Warna Biru Royal */
+    color: white;
+    border: none;
+    transition: .2s;
+}
+.btn-royal:hover { background-color: #0D47A1; color: white; }
+
+/* Kategori Icons */
+.cat-item {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.cat-item:hover {
+    transform: translateY(-5px);
+    color: #0EA5E9; /* Warna hover biru */
+}
+.cat-item i {
+    /* Warna ikon hitam default */
+    color: #000; 
+}
+
+/* Product Cards Sederhana */
+.product-card {
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.product-card:hover {
+    opacity: 0.8;
+}

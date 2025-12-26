@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GigaGears Admin — Promotions</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="css/admin.css">
+
+  <style>
+    /* --- Layout Fix (Sidebar & Mobile) --- */
+    .admin-side {
+        width: 280px; height: 100vh; background: #fff; border-right: 1px solid #E6ECFB;
+        flex-shrink: 0; transition: transform 0.3s ease-in-out;
+        display: flex; flex-direction: column; position: sticky; top: 0;
+    }
+    .nav-admin { flex: 1; overflow-y: auto; }
+
+    @media (max-width: 991.98px) {
+        .admin-side { position: fixed; top: 0; left: 0; bottom: 0; z-index: 1050; transform: translateX(-100%); box-shadow: none; }
+        .admin-side.show { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,0.15); }
+    }
+    .sidebar-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); 
+        z-index: 1040; display: none; opacity: 0; transition: opacity 0.3s;
+    }
+    .sidebar-overlay.show { display: block; opacity: 1; }
+
+    /* --- Style Khusus Promotion Page --- */
+    .table-blue-head thead th {
+      background-color: #0D6EFD !important; color: #fff !important;
+      font-weight: 600; border: 0; padding: 14px;
+    }
+    .table-blue-head thead th:first-child { border-top-left-radius: 8px; }
+    .table-blue-head thead th:last-child { border-top-right-radius: 8px; }
+    .table-blue-head tbody td { padding: 14px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; font-weight: 500; }
+    .btn-orange { background-color: #FF8C00; color: white; border: 1px solid #E07B00; }
+    .btn-orange:hover { background-color: #E07B00; color: white; }
+
+    /* Add Modal Checkbox Style */
+    .check-box-card {
+      border: 1px solid var(--gg-border); border-radius: 10px; padding: 12px;
+      display: flex; align-items: center; gap: 10px; background: #fff; transition: .2s; cursor: pointer;
+    }
+    .check-box-card:hover { background: #F7FAFF; border-color: var(--gg-primary); }
+    .form-check-input { cursor: pointer; }
+
+    /* Ticket Detail Style */
+    .voucher-ticket {
+      background: linear-gradient(135deg, #0D6EFD 0%, #0043A8 100%);
+      border-radius: 16px; color: #fff; padding: 24px;
+      position: relative; overflow: hidden; margin-bottom: 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .voucher-ticket::before, .voucher-ticket::after {
+      content: ''; position: absolute; width: 30px; height: 30px; background: #fff; border-radius: 50%;
+      top: 50%; transform: translateY(-50%);
+    }
+    .voucher-ticket::before { left: -15px; }
+    .voucher-ticket::after { right: -15px; }
+    .voucher-code-box {
+      background: rgba(255,255,255,0.2); border: 2px dashed rgba(255,255,255,0.6);
+      padding: 10px 20px; border-radius: 8px; font-family: monospace; font-size: 1.5rem; font-weight: 700; letter-spacing: 2px;
+    }
+    .mini-stat { background: #F8FAFC; border: 1px solid #E6ECFB; border-radius: 12px; padding: 16px; text-align: center; }
+    .mini-stat-val { font-size: 1.4rem; font-weight: 700; color: var(--gg-primary); margin-bottom: 0; }
+    .mini-stat-lbl { font-size: 0.8rem; color: #8290A5; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+    .detail-label { font-size: 0.85rem; color: #8290A5; display: block; margin-bottom: 4px; }
+    .detail-value { font-weight: 600; font-size: 1rem; color: var(--gg-ink); }
+  </style>
+</head>
+<body>
+  
+  <div class="container-fluid p-0 d-flex" style="min-height: 100vh; overflow-x: hidden;">
+    
+    <aside class="admin-side" id="adminSidebar">
+        <a href="dashboard.html" class="brand-link" aria-label="GigaGears">
+          <img src="../assets/gigagears-logo.png" alt="GigaGears" class="brand-logo">
+        </a>
+
+        <nav class="nav flex-column nav-admin">
+          <a class="nav-link" href="dashboard.html"><i class="bi bi-grid-1x2"></i>Dashboard</a>
+          <a class="nav-link" href="customer.html"><i class="bi bi-people"></i>Data Customer</a>
+          <a class="nav-link" href="seller.html"><i class="bi bi-person-badge"></i>Data Seller</a>
+          <a class="nav-link active" href="promotion.html"><i class="bi bi-ticket-perforated"></i>Promotion/Voucher</a>
+          <a class="nav-link" href="transaction.html"><i class="bi bi-receipt"></i>Data Transaction</a>
+          <a class="nav-link" href="analytics.html"><i class="bi bi-bar-chart"></i>Analytics & Report</a>
+          <a class="nav-link" href="product.html"><i class="bi bi-box"></i>Products</a>
+          <a class="nav-link" href="inbox.html"><i class="bi bi-inbox"></i>Inbox</a>
+          <a class="nav-link" href="payment-verif.html"><i class="bi bi-shield-check"></i>Payment Verification</a>
+          <a class="nav-link" href="shipping.html"><i class="bi bi-truck"></i>Shipping Settings</a>
+        </nav>
+
+        <div class="mt-auto pb-4 px-3">
+          <button class="btn btn-logout w-100"><i class="bi bi-box-arrow-right me-1"></i> Log Out</button>
+        </div>
+    </aside>
+
+    <main class="main-wrap flex-grow-1" style="min-width: 0;">
+
+        <div class="appbar px-3 px-md-4 py-3 mb-4 d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-light d-lg-none shadow-sm p-1 px-2" id="btnToggle" style="border-radius: 8px;">
+                <i class="bi bi-list fs-3"></i>
+            </button>
+            <div>
+                <div class="small opacity-75 mb-1">Manage all active and upcoming promotions across GigaGears</div>
+                <h1 class="wc-title h3 mb-0">Promotions & Vouchers</h1>
+            </div>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-light btn-sm"><i class="bi bi-bell"></i></button>
+            <span class="badge-chip d-inline-flex align-items-center gap-2">
+              <img src="https://ui-avatars.com/api/?name=Admin&background=random" class="rounded-circle" width="24" height="24"> Admin
+            </span>
+          </div>
+        </div>
+
+        <div class="gg-card p-3 p-md-4 mb-3">
+          <div class="row g-2 align-items-center">
+            <div class="col-12 col-md-6">
+              <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input id="searchInput" type="text" class="form-control" placeholder="Search by Code, Type...">
+              </div>
+            </div>
+            <div class="col-12 col-md-6 text-md-end d-flex gap-2 justify-content-md-end">
+              <button class="btn btn-orange"><i class="bi bi-upload me-1"></i> Export Data</button>
+              <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal"><i class="bi bi-plus-lg me-1"></i> Add New Voucher</button>
+            </div>
+          </div>
+        </div>
+
+        <section class="gg-card p-0">
+          <div class="table-responsive">
+            <table class="table table-blue-head table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Voucher ID</th><th>Title / Code</th><th>Type</th><th>Discount Value</th>
+                  <th>Valid From</th><th>Valid To</th><th>Status</th><th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="tbodyVoucher"></tbody>
+            </table>
+          </div>
+          <div class="d-flex justify-content-between align-items-center px-3 px-md-4 py-3 border-top">
+            <div class="small text-muted"><span id="countInfo">0</span> results</div>
+            <nav><ul class="pagination pagination-sm mb-0" id="pager"></ul></nav>
+          </div>
+        </section>
+
+        <p class="text-center mt-4 foot small mb-0">© 2025 GigaGears. All rights reserved.</p>
+    </main>
+  </div>
+
+  <div class="modal fade" id="addModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+      <div class="modal-content">
+        <div class="modal-header">
+            <div><h5 class="modal-title fw-bold">Add New Voucher</h5><p class="text-muted small mb-0">Create a new promotion or voucher code.</p></div>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+            <form>
+                <h6 class="fw-bold mb-3">Voucher Information</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6"><label class="form-label small text-muted">Voucher Code</label><input type="text" class="form-control" placeholder="e.g. GIGA10OFF"></div>
+                    <div class="col-md-6"><label class="form-label small text-muted">Voucher Title</label><input type="text" class="form-control" placeholder="e.g. 10% Off"></div>
+                    <div class="col-12"><label class="form-label small text-muted">Description</label><textarea class="form-control" rows="2" placeholder="Description..."></textarea></div>
+                </div>
+                <h6 class="fw-bold mb-3">Discount Type</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-4"><label class="check-box-card"><input class="form-check-input mt-0" type="checkbox" checked><span class="small fw-semibold">Percentage (% Off)</span></label></div>
+                    <div class="col-md-4"><label class="check-box-card"><input class="form-check-input mt-0" type="checkbox"><span class="small fw-semibold">Fixed Amount ($ Off)</span></label></div>
+                    <div class="col-md-4"><label class="check-box-card"><input class="form-check-input mt-0" type="checkbox"><span class="small fw-semibold">Free Shipping</span></label></div>
+                </div>
+                <h6 class="fw-bold mb-3">Discount Value</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6"><label class="form-label small text-muted">If Percentage %</label><input type="number" class="form-control" placeholder="0"></div>
+                    <div class="col-md-6"><label class="form-label small text-muted">If Fixed Amount</label><div class="input-group"><span class="input-group-text">$</span><input type="number" class="form-control" placeholder="0.00"></div></div>
+                </div>
+                <h6 class="fw-bold mb-3">Validity Period</h6>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6"><label class="form-label small text-muted">Start Date</label><input type="date" class="form-control"></div>
+                    <div class="col-md-6"><label class="form-label small text-muted">End Date</label><input type="date" class="form-control"></div>
+                </div>
+                <h6 class="fw-bold mb-3">Products / Categories</h6>
+                <div class="row g-3">
+                    <div class="col-md-4"><label class="check-box-card"><input class="form-check-input mt-0" type="checkbox"><span class="small text-muted">All Products</span></label></div>
+                    <div class="col-md-4"><label class="check-box-card"><input class="form-check-input mt-0" type="checkbox"><span class="small text-muted">Accessories</span></label></div>
+                    <div class="col-md-4"><label class="check-box-card"><input class="form-check-input mt-0" type="checkbox"><span class="small text-muted">Laptop</span></label></div>
+                    <div class="col-md-4"><label class="check-box-card"><input class="form-check-input mt-0" type="checkbox"><span class="small text-muted">Gaming</span></label></div>
+                    <div class="col-md-4"><label class="check-box-card"><input class="form-check-input mt-0" type="checkbox"><span class="small text-muted">Mac</span></label></div>
+                    <div class="col-md-4"><label class="check-box-card"><input class="form-check-input mt-0" type="checkbox"><span class="small text-muted">Software</span></label></div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer bg-light">
+            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Save as Draft</button>
+            <button type="button" class="btn btn-primary px-4">Publish</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="viewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content border-0">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold">Voucher Performance & Detail</h5>
+          <button class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-4">
+            <div class="voucher-ticket">
+                <div><div class="opacity-75 small mb-1">VOUCHER CODE</div><div id="vm-code" class="voucher-code-box">CODE</div></div>
+                <div class="text-end"><div id="vm-value" class="display-6 fw-bold">0%</div><div id="vm-type" class="small opacity-75">Discount Type</div></div>
+            </div>
+            <h6 class="fw-bold mb-3">Usage Statistics</h6>
+            <div class="row g-3 mb-4">
+                <div class="col-4"><div class="mini-stat"><div class="mini-stat-lbl">Redeemed</div><div class="mini-stat-val text-primary">1,240</div><div class="small text-muted">times</div></div></div>
+                <div class="col-4"><div class="mini-stat"><div class="mini-stat-lbl">Total Saved</div><div class="mini-stat-val text-success">$4,500</div><div class="small text-muted">by customers</div></div></div>
+                <div class="col-4"><div class="mini-stat"><div class="mini-stat-lbl">Remaining</div><div class="mini-stat-val text-warning">760</div><div class="small text-muted">quota</div></div></div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6 border-end">
+                    <h6 class="fw-bold mb-3">Campaign Details</h6>
+                    <div class="mb-3"><span class="detail-label">Title</span><span id="vm-title" class="detail-value">-</span></div>
+                    <div class="mb-3"><span class="detail-label">Description</span><span class="detail-value small">Special discount for new user registration campaign.</span></div>
+                    <div class="row">
+                        <div class="col-6"><span class="detail-label">Valid From</span><span id="vm-from" class="detail-value text-success">-</span></div>
+                        <div class="col-6"><span class="detail-label">Valid To</span><span id="vm-to" class="detail-value text-danger">-</span></div>
+                    </div>
+                </div>
+                <div class="col-md-6 ps-md-4">
+                    <h6 class="fw-bold mb-3">Terms & Conditions</h6>
+                    <ul class="small text-muted ps-3 mb-3">
+                        <li class="mb-1">Minimum purchase amount <b>$50.00</b></li>
+                        <li class="mb-1">Maximum discount cap <b>$20.00</b></li>
+                        <li class="mb-1">Applicable for <b>All Categories</b></li>
+                    </ul>
+                    <div class="mt-4"><span class="detail-label">Status</span><span id="vm-status" class="badge-status active">Active</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer bg-light border-0">
+            <button class="btn btn-outline-danger me-auto"><i class="bi bi-stop-circle me-2"></i>Deactivate Voucher</button>
+            <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+  <script>
+    const btnToggle = document.getElementById('btnToggle');
+    const sidebar = document.getElementById('adminSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    function toggleSidebar() {
+        sidebar.classList.toggle('show');
+        overlay.classList.toggle('show');
+    }
+
+    if(btnToggle) btnToggle.addEventListener('click', toggleSidebar);
+    if(overlay) overlay.addEventListener('click', toggleSidebar);
+  </script>
+
+  <script>
+    const vouchers = Array.from({length: 24}).map((_,i)=>({
+        id: "VCHR-" + String(1001+i),
+        code: ["GIGA10OFF", "FLASH50", "NEWUSER", "FREESHIP", "WEEKEND"][i%5],
+        title: ["New User Promo", "Flash Sale Sept", "New User Special", "Free Shipping All", "Weekend Deal"][i%5],
+        type: "Percentage",
+        value: "10%",
+        from: "Sep 01, 25",
+        to: "Sep 30, 25",
+        status: "Active"
+    }));
+
+    let state = { q: "", page: 1, pageSize: 8 };
+    const el = id => document.getElementById(id);
+
+    function render() {
+        let data = vouchers;
+        if(state.q) data = data.filter(v => v.code.toLowerCase().includes(state.q.toLowerCase()));
+        const total = data.length;
+        const pages = Math.ceil(total / state.pageSize);
+        if(state.page > pages) state.page = pages || 1; 
+        const start = (state.page-1) * state.pageSize;
+        const rows = data.slice(start, start + state.pageSize);
+
+        el("tbodyVoucher").innerHTML = rows.map(v => `
+            <tr>
+                <td class="text-muted fw-semibold">${v.id}</td>
+                <td class="fw-bold">${v.code}</td>
+                <td class="fw-bold" style="color: #F59E0B;">${v.type}</td>
+                <td class="fw-bold">${v.value}</td>
+                <td class="fw-bold text-muted small">${v.from}</td>
+                <td class="fw-bold text-muted small">${v.to}</td>
+                <td class="fw-bold text-success">Active</td>
+                <td class="text-center">
+                    <div class="d-inline-flex gap-3">
+                        <button class="btn p-0 border-0 text-primary" onclick="openView('${v.id}')" title="View"><i class="bi bi-eye-fill fs-5"></i></button>
+                        <button class="btn p-0 border-0 text-warning" title="Edit"><i class="bi bi-pencil-fill fs-5"></i></button>
+                        <button class="btn p-0 border-0 text-danger" title="Delete"><i class="bi bi-trash-fill fs-5"></i></button>
+                    </div>
+                </td>
+            </tr>
+        `).join("");
+        
+        el("countInfo").innerText = total;
+        let html = ''; for(let p=1; p<=pages; p++) html += `<li class="page-item ${p===state.page?'active':''}"><a class="page-link" href="#" onclick="state.page=${p};render();return false;">${p}</a></li>`;
+        el("pager").innerHTML = html;
+    }
+
+    window.openView = function(id) {
+        const v = vouchers.find(x => x.id === id);
+        if(v) {
+            el('vm-code').innerText = v.code;
+            el('vm-title').innerText = v.title;
+            el('vm-type').innerText = v.type + " Discount";
+            el('vm-value').innerText = v.value;
+            el('vm-from').innerText = v.from;
+            el('vm-to').innerText = v.to;
+            document.querySelector('.mini-stat-val.text-primary').innerText = Math.floor(Math.random() * 2000) + 100;
+            new bootstrap.Modal(document.getElementById('viewModal')).show();
+        }
+    };
+
+    el("searchInput").addEventListener("input", (e) => { state.q = e.target.value.trim(); state.page = 1; render(); });
+    render();
+  </script>
+</body>
+</html>

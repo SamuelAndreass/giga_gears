@@ -1,0 +1,417 @@
+/* =========================================================
+   GigaGears — ADMIN THEME (dashboard, customer, login)
+   File: /AdminPage/css/admin.css
+   ========================================================= */
+
+/* ===== Font, reset ringan, dan palet ===== */
+@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@400;600;700&display=swap');
+
+:root{
+  /* brand */
+  --gg-primary: #1357FF;          /* biru utama */
+  --gg-primary-600:#0F49DB;
+  --gg-primary-700:#0B37A9;
+  --gg-primary-100:#E9F1FF;
+
+  --gg-accent:  #64E1FF;          /* ujung gradient */
+  --gg-ink:     #0C1327;          /* text heading */
+  --gg-body:    #334155;          /* text normal */
+  --gg-muted:   #8290A5;          /* text sekunder */
+
+  --gg-bg:      #F5F8FF;          /* latar app */
+  --gg-card:    #FFFFFF;
+  --gg-border:  #E6ECFB;
+  --gg-shadow:  0 6px 18px rgba(19,87,255,.08);
+
+  /* status pills (disamakan dgn seller) */
+  --st-pending:   #FFC107;
+  --st-processing:#17A2B8;
+  --st-completed: #22C55E;
+  --st-cancelled: #EF4444;
+  --st-suspended: #E11D48;
+  --st-active:    #16A34A;
+
+  /* warna chart (dibaca script Chart.js) */
+  --pie-1:#4dabf7; 
+  --pie-2:#51cf66; 
+  --pie-3:#ffd43b; 
+  --pie-4:#845ef7; 
+  --pie-5:#ff6b6b;
+}
+
+*{ box-sizing: border-box }
+html,body{ height:100% }
+body{
+  font-family:"Chakra Petch",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  color:var(--gg-body);
+  background:
+    radial-gradient(1200px 600px at 85% -100px, #ECF5FF 0%, transparent 70%),
+    radial-gradient(800px 400px at -100px 90%, #EDF3FF 0%, transparent 70%),
+    var(--gg-bg);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+img{ max-width:100%; display:block }
+
+/* ===== Util kecil ===== */
+.text-muted-gg{ color:var(--gg-muted)!important }
+.fw-black{ font-weight:800 }
+.round-16{ border-radius:16px }
+.shadow-gg{ box-shadow: var(--gg-shadow) }
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+.side{
+  background: #ffffff;
+  border-right: 1px solid var(--gg-border);
+  padding: 20px 16px;
+  min-height: 100vh;
+}
+.brand-link{ display:block; padding:4px 8px 16px }
+.brand-logo{ width:180px; height:auto }
+
+.nav-gg{ gap:6px }
+.nav-gg .nav-link{
+  display:flex; align-items:center; gap:10px;
+  padding:12px 14px; border-radius:14px;
+  color:var(--gg-ink); text-decoration:none;
+  border:1px solid transparent;
+  transition:.2s ease;
+}
+.nav-gg .nav-link i{ font-size:18px; opacity:.85 }
+.nav-gg .nav-link:hover{
+  background: var(--gg-primary-100);
+  border-color: #CFE0FF;
+  color: var(--gg-primary-700);
+}
+.nav-gg .nav-link.active{
+  background: linear-gradient(135deg, #EAF2FF 0%, #F3FAFF 100%);
+  border-color: #BBD0FF;
+  box-shadow: inset 0 0 0 1px rgba(19,87,255,.04), var(--gg-shadow);
+  color: var(--gg-primary-700);
+}
+
+.btn-logout{
+  border:1px solid #F2C1C1!important;
+  color:#D22C2C!important;
+  background:#FFF6F6!important;
+  border-radius:12px!important;
+}
+
+/* =========================================================
+   APP BAR (header gradient biru)
+   ========================================================= */
+.appbar{
+  background: linear-gradient(98deg, var(--gg-primary) 0%, var(--gg-primary-700) 55%, var(--gg-accent) 100%);
+  color:#fff; border-radius:18px; box-shadow: var(--gg-shadow);
+}
+.appbar .wc-title{
+  font-weight:800; letter-spacing:.4px;
+  padding:.35rem .9rem;
+  border-radius:12px;
+  background:
+    linear-gradient(90deg, rgba(255,255,255,.25), rgba(255,255,255,.06)),
+    linear-gradient(98deg, #2C7CFF 0%, #69D8FF 100%);
+  color:#fff; display:inline-block;
+}
+
+/* =========================================================
+   KARTU / PANEL
+   ========================================================= */
+.gg-card{
+  background: var(--gg-card);
+  border:1px solid var(--gg-border);
+  border-radius:18px;
+  box-shadow: var(--gg-shadow);
+}
+
+.kpi{
+  display:flex; gap:12px; align-items:center;
+  padding:16px; background:#fff; border:1px solid var(--gg-border);
+  border-radius:16px; box-shadow: var(--gg-shadow);
+}
+
+/* =========================================================
+   FORM & INPUT
+   ========================================================= */
+.form-control, .form-select, .input-group-text{
+  border-radius:12px!important;
+  border:1px solid var(--gg-border)!important;
+}
+.input-group-text{ background:#F7FAFF!important; color:var(--gg-primary-700)!important }
+
+/* =========================================================
+   TOMBOL
+   ========================================================= */
+.btn{ border-radius:12px }
+.btn-primary{
+  background: var(--gg-primary);
+  border-color:var(--gg-primary-600);
+}
+.btn-primary:hover{ background:var(--gg-primary-600); border-color:var(--gg-primary-700) }
+.btn-outline-secondary{ border-color:#CAD7F6; color:#35527A }
+.btn-outline-secondary:hover{ background:#EEF4FF; color:var(--gg-primary-700); border-color:#AEC3FF }
+
+/* =========================================================
+   TABEL ADMIN (dipakai dashboard section & customer.html)
+   ========================================================= */
+.table{ --bs-table-bg:transparent }
+.table thead th{
+  background: var(--gg-primary);
+  color:#fff; border:0; padding:12px 14px; font-weight:700;
+}
+.table thead tr{ border:0 }
+.table tbody td{
+  vertical-align: middle; border-color: var(--gg-border);
+  color:var(--gg-ink);
+}
+.table tr:hover td{ background:#FAFCFF }
+
+/* kolom kecil qty bila ada */
+.col-qty{ width:70px; text-align:center }
+
+/* Badge status konsisten */
+.badge-status{
+  display:inline-block; padding:.25rem .55rem;
+  border-radius:999px; font-weight:700; font-size:.85rem;
+  border:1px solid transparent;
+}
+.badge-status.pending{    background:#FFF6D6; color:#8A6D00; border-color:#FCE6A4 }
+.badge-status.processing{ background:#E7FAFF; color:#0B6673; border-color:#BFEFFF }
+.badge-status.completed{  background:#E9FBEF; color:#146D38; border-color:#BFF0D1 }
+.badge-status.cancelled{  background:#FFE9E9; color:#9C1C1C; border-color:#FFC9C9 }
+.badge-status.suspended{  background:#FFE6EC; color:#9B1231; border-color:#FFC1D0 }
+.badge-status.active{     background:#E9FBEF; color:#146D38; border-color:#BFF0D1 }
+
+/* badge chip kecil (TW / Admin pill) */
+.badge-chip{
+  background: rgba(255,255,255,.18);
+  border:1px solid rgba(255,255,255,.35);
+  color:#fff; padding:.35rem .6rem;
+  border-radius:12px;
+}
+
+/* =========================================================
+   LOGIN ADMIN
+   ========================================================= */
+.admin-login{
+  min-height:100vh; display:grid; grid-template-columns: 1.1fr .9fr;
+}
+.admin-login .pane-left{ padding:48px 6vw }
+.admin-login .pane-right{
+  background:
+    linear-gradient(98deg, rgba(19,87,255,.85) 0%, rgba(100,225,255,.75) 100%),
+    url('../assets/admin-login-bg.jpg') center/cover no-repeat;
+  color:#fff; padding:48px 5vw;
+}
+.admin-login .brand{ margin-bottom:28px }
+.admin-login h1{ font-size:38px; color:var(--gg-ink) }
+.admin-login .card{
+  background:#fff; border:1px solid var(--gg-border);
+  border-radius:16px; box-shadow: var(--gg-shadow);
+}
+
+/* =========================================================
+   CHART AREA (Chart.js)
+   ========================================================= */
+/* Pastikan kanvas transparan (bukan hitam) */
+canvas{ background:transparent!important }
+.chart-card .card-body{ padding:16px 16px 8px }
+
+/* =========================================================
+   HELPERS UNTUK GRID BOOTSTRAP
+   ========================================================= */
+.main-wrap{ padding:18px 20px 28px }
+.section-title{ font-weight:800; color:var(--gg-ink) }
+
+/* table action buttons kecil */
+.table .btn-icon{
+  width:34px; height:34px; display:inline-flex; align-items:center; justify-content:center;
+  border-radius:10px; border:1px solid #CAD7F6; background:#fff; color:#35527A;
+}
+.table .btn-icon:hover{ background:#EEF4FF; color:var(--gg-primary-700); border-color:#AEC3FF }
+
+/* alert */
+.alert{ border-radius:14px; border:1px solid var(--gg-border) }
+.alert-warning{ background:#FFF7E5; border-color:#FFE8B3; color:#7A5A00 }
+.alert-danger{ background:#FFECEC; border-color:#FFC9C9; color:#8F1E1E }
+
+/* pagination sederhana */
+.gg-page .page-link{
+  border-radius:10px; color:#35527A; border-color:#CAD7F6;
+}
+.gg-page .page-item.active .page-link{
+  background:var(--gg-primary); border-color:var(--gg-primary); color:#fff;
+}
+
+/* footer kecil */
+.foot{ color:var(--gg-muted) }
+
+/* === Normalize admin sidebar spacing across pages === */
+.admin-side{ padding:24px 16px; background:#fff; border-right:1px solid var(--gg-border);min-height: 100vh; }
+.nav-admin{ gap:8px; }                           /* vertical spacing between items */
+.nav-admin .nav-link{
+  display:flex; align-items:center; gap:10px;
+  padding:12px 14px; border-radius:14px; border:1px solid transparent;
+  color:var(--gg-ink); text-decoration:none;
+}
+.nav-admin .nav-link i{ font-size:18px; opacity:.85 }
+.nav-admin .nav-link:hover{
+  background: var(--gg-primary-100); border-color:#CFE0FF; color:var(--gg-primary-700);
+}
+.nav-admin .nav-link.active{
+  background: linear-gradient(135deg,#EAF2FF 0%,#F3FAFF 100%);
+  border-color:#BBD0FF; box-shadow: inset 0 0 0 1px rgba(19,87,255,.04), var(--gg-shadow);
+  color: var(--gg-primary-700);
+}
+.brand-link{ display:block; padding:4px 8px 16px }
+.brand-logo{ width:180px; height:auto }
+
+/* ===== Sidebar Normalizer (samakan gap & padding di semua page) ===== */
+.admin-side, .side{
+  padding:24px 16px;              /* konsisten */
+}
+
+.admin-side .nav-gg,
+.side .nav-gg{
+  display:flex;
+  flex-direction:column;
+  gap:14px !important;            /* JARAK ANTAR MENU */
+  margin:0;
+  padding:0;
+}
+
+.admin-side .nav-gg .nav-link,
+.side .nav-gg .nav-link{
+  display:flex; align-items:center; gap:10px;
+  padding:12px 14px !important;   /* PADDING ITEM MENU */
+  margin:0 !important;            /* hilangkan margin sisa */
+  border-radius:14px;
+  line-height:1.05;
+}
+
+.admin-side .nav-gg .nav-link i,
+.side  .nav-gg .nav-link i{
+  width:20px; min-width:20px;     /* ikon rata & tidak “loncat” */
+  text-align:center;
+}
+
+.admin-side .brand-link,
+.side .brand-link{
+  display:block;
+  margin-bottom:22px;             /* jarak brand ke menu */
+}
+
+/* --- Tambahan untuk Seller Page (Append ke paling bawah admin.css) --- */
+
+/* Tombol Export warna Oranye sesuai desain Figma */
+.btn-orange {
+  background-color: #FF8C00;
+  color: white;
+  border: 1px solid #E07B00;
+}
+.btn-orange:hover {
+  background-color: #E07B00;
+  color: white;
+}
+
+/* Style khusus untuk action buttons di tabel Seller */
+.btn-action-pill {
+  padding: 4px 12px;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  font-weight: 600;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+
+/* --- TAMBAHAN UNTUK DETAIL SELLER (MODAL & PAGE) --- */
+
+/* Wrapper untuk konten detail agar rapi di dalam modal */
+.detail-wrapper {
+  background: var(--gg-bg); /* Warna latar abu-abu muda */
+  padding: 20px;
+}
+
+/* Penyesuaian Header Card di dalam modal */
+.seller-header-card {
+  border-radius: 16px; overflow: hidden; position: relative;
+  background: var(--gg-card); border: 1px solid var(--gg-border); box-shadow: var(--gg-shadow);
+  margin-bottom: 24px;
+}
+.seller-banner {
+  height: 150px; /* Sedikit lebih pendek untuk modal */
+  background: linear-gradient(90deg, #1e293b 0%, #334155 100%); position: relative;
+}
+.seller-avatar-wrap {
+  position: absolute; bottom: -25px; left: 25px;
+  width: 90px; height: 90px; /* Sedikit lebih kecil */
+  border-radius: 50%; background: #fff; padding: 4px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.seller-avatar-img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; border: 2px solid var(--gg-primary-100); }
+.seller-info-header { padding-left: 135px; padding-top: 10px; padding-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-start; }
+
+/* Kartu Statistik */
+.stat-card-box {
+  background: #fff; border: 1px solid var(--gg-border); border-radius: 14px;
+  padding: 15px; text-align: center; height: 100%;
+}
+.stat-value { font-size: 1.75rem; font-weight: 800; color: var(--gg-primary); margin-bottom: 0; line-height: 1.2; }
+.stat-label { color: var(--gg-muted); font-size: 0.85rem; font-weight: 600; }
+
+/* Tabel Header Biru */
+.table-blue-head thead th { background-color: #0F6CBD !important; color: #fff !important; font-weight: 600; border: none; padding: 12px 14px; }
+.table-blue-head tbody td { padding: 12px 14px; border-bottom: 1px solid #eee; vertical-align: middle;}
+.table-blue-head tbody tr:last-child td { border-bottom: 0; }
+.table-blue-head thead th:first-child { border-top-left-radius: 10px; }
+.table-blue-head thead th:last-child { border-top-right-radius: 10px; }
+
+/* Info Bank Box */
+.bank-box { background: #F8FAFC; border-left: 4px solid var(--gg-primary); padding: 10px 12px; border-radius: 0 8px 8px 0; margin-top: 8px; }
+.nav-admin .nav-link {
+  display: flex; 
+  align-items: center; 
+  gap: 10px;
+  padding: 12px 14px; 
+  border-radius: 14px; 
+  border: 1px solid transparent;
+  color: var(--gg-ink); 
+  text-decoration: none;
+  
+  white-space: normal;       
+  line-height: 1.2;          
+  font-size: 0.95rem;        
+}
+
+.nav-admin .nav-link i {
+  font-size: 18px; 
+  opacity: .85;
+  flex-shrink: 0; 
+}
+
+.admin-side {
+    width: 280px !important;  /* Ini kuncinya: Lebar Tetap */
+    min-height: 100vh;
+    border-right: 1px solid var(--gg-border);
+    background: #fff;
+    flex-shrink: 0; /* Mencegah sidebar tergencet */
+}
+
+.main-wrap {
+    background: transparent; 
+    padding: 24px 32px; /* Padding konten */
+}
+
+/* Style agar teks panjang tidak nembus */
+.nav-admin .nav-link {
+    display: flex; 
+    align-items: center; 
+    gap: 12px;
+    padding: 12px 16px;
+    
+    /* Kunci agar teks rapi */
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
