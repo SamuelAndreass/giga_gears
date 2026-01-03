@@ -51,7 +51,7 @@ class User extends Authenticatable
 
     public function getAvatarUrlAttribute()
     {
-        $path = $this->customerProfile?->avatar_path ?? null;
+        $path = $this->customerProfile->avatar_path ?? null;
 
         if ($path) {
             return Storage::url($path);
@@ -63,7 +63,7 @@ class User extends Authenticatable
         return $this->hasOne(CustomerProfile::class);
     }
 
-    public function sellerStore(){ return $this->hasOne(SellerStore::class);}
+    public function sellerStore(){ return $this->hasOne(Sellerstore::class);}
     
     public function cart(){ return $this->hasOne(Cart::class);}
 

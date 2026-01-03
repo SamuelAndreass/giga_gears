@@ -34,10 +34,6 @@ class AuthenticatedSessionController extends Controller
             abort(500, 'Authentication failed: user is Null after authenticate().');
         }
 
-        if ($user->role === 'customer' && !$user->customerProfile) {
-            \App\Models\CustomerProfile::create(['user_id' => $user->id]);
-        }
-
         switch($user->role) {
             case 'admin':
                 return redirect()->route('admin.dashboard');

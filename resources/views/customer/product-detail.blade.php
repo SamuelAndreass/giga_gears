@@ -10,48 +10,68 @@
         .header-wrapper {
             width: 100%;
             height: 90px;
-            padding-top: 20px;
+            padding-top: 20px; 
             background: #FFFFFF;
             border-bottom: 1px solid #eee;
         }
         .main-navbar {
             width: 1280px;
-            max-width: 90%;
-            margin: 0 auto;
+            max-width: 90%; 
+            margin: 0 auto; 
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+        .back-icon {
+            position: relative;
+            width: 43px;
+            height: 43px;
+            left: 0;
+            top: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #717171;
+            border-radius: 9999px;
+            text-decoration: none;
+            z-index: 20;
+            transform: translateX(-50%); 
+        }
     </style>
     
     <div class="header-wrapper">
+        
+        {{-- Frame 19: NAVBAR --}}
         <div class="page-container main-navbar">
             <img src="{{ asset('images/logo GigaGears.png') }}" alt="GIGAGEARS Logo" width="197" height="24">
-            <div class="d-flex" style="gap: 45px; font-size:22px; align-items: center;">
+            
+            {{-- Frame 16: Links --}}
+            <div class="d-flex" style="gap: 71px; font-size:25px">
                 <div class="d-flex gap-3">
-                    <a href="{{ route('dashboard') }}" style="color: #000000; text-decoration: none; white-space: nowrap;">Home</a>
-                    <a href="{{ route('products.index') }}" style="color: #067CC2; text-decoration: none; white-space: nowrap;">Products</a>
-                    <a href="/#about-us-section" style="color: #000000; text-decoration: none; white-space: nowrap;">About Us</a>
-                    <a href="{{ route('orders.index') }}" style="color: #000000; text-decoration: none; white-space: nowrap;">My Order</a>
-                    <a href="{{ route('community.index') }}" style="color: #000000; text-decoration: none; white-space: nowrap;">Communities</a>
-                    <a href="{{ route('seminar.index') }}" style="color: #000000; text-decoration: none; white-space: nowrap;">Seminars</a>
+                    <a href="{{ route('dashboard') }}" style="color: #000000; text-decoration: none;">Home</a>
+                    <a href="{{ route('products.index') }}" style="color: #067CC2; text-decoration: none;">Products</a>
+                    <a href="/#about-us-section" style="color: #000000; text-decoration: none;">About Us</a>
+                    <a href="{{ route('orders.index') }}" style="color: #000000; text-decoration: none;">My Order</a>
+                    <a href="{{ route('community.index') }}" style="color: #000000; text-decoration: none;">Communities</a>
+                    <a href="{{ route('seminar.index') }}" style="color: #000000; text-decoration: none;">Seminar</a>
                     <a href="{{ route('cart.index') }}" 
-                        class="position-relative text-decoration-none text-dark" style="white-space: nowrap;">
-                        <i class="bi bi-cart3"></i>
-                        @if($cartCount > 0)
-                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger fs-6">
-                                {{ $cartCount }}
-                            </span>
-                        @endif
+                    class="position-relative text-decoration-none 
+                    {{ request()->routeIs('cart.index') ? 'text-primary fw-bold' : 'text-dark' }}">
+                    <i class="bi bi-cart3 fs-4"></i>
+                    @if($cartCount > 0)
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill fs-6 
+                                    {{ request()->routeIs('cart.index') ? 'bg-primary' : 'bg-danger' }}">
+                            {{ $cartCount }}
+                        </span>
+                    @endif
                     </a>
                 </div>
             </div>
 
-            <a href="{{ route('profile.edit') }}" class="d-flex align-items-center justify-content-center" style="border: 1px solid #000000; border-radius: 5px; padding: 10px; width: 135px; height: 52px; text-decoration: none; color: #000;">
-                <div class="d-flex align-items-center" style="gap: 9px;">
-                    <span>Profile</span>
-                    <img src="{{ asset(Auth::user()->customerProfile?->avatar_path ?? 'images/logo foto profile.png') }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
-                </div>
+            {{-- Frame 18: Profil Button --}}
+            <a href="{{ route('profile.edit') }}" style="border: 1px solid #000; border-radius: 5px; padding: 10px 15px; color: #000; text-decoration: none;">
+                <span>Profile</span>
+                <img src="{{ asset(Auth::user()->customerProfile->avatar_path ?? 'images/pp.png') }}" alt="Profile" width="32" height="32" style="border-radius:50%;margin-left:9px;">
             </a>
         </div>
     </div>
@@ -86,10 +106,23 @@
             
             {{-- Frame 60 & 35: Harga & Save --}}
             <div class="d-flex flex-column" style="gap: 9px;">
-                <div class="d-flex align-items-center gap-2">
-                    <span style="font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 24px; color: #787878;">Rp.{{$detailProduct->original_price}}</span>
-                </div>
+                @if($detailProduct->type === 'bundle')
+                    <span style="font-size:22px;text-decoration:line-through;color:#888;">
+                        Rp {{ number_format($detailProduct->original_price) }}
+                    </span>
+                    <span style="font-size:36px;font-weight:700;color:#067CC2;">
+                        Rp {{ number_format($detailProduct->price) }}
+                    </span>
+                    <span class="badge bg-success w-fit">
+                        Hemat Rp {{ number_format($detailProduct->original_price - $detailProduct->price) }}
+                    </span>
+                @else
+                    <span style="font-size:36px;font-weight:700;color:#067CC2;">
+                        Rp {{ number_format($detailProduct->price) }}
+                    </span>
+                @endif
             </div>
+
             
             {{-- Frame 64: Color Options --}}
             {{-- <div class="d-flex flex-column" style="gap: 14px;">
@@ -106,19 +139,19 @@
 
             {{-- Frame 73: Tombol Buy Now & Add to Cart --}}
             <div class="d-flex gap-2" style="width: 100%; margin-top: 100px;">
-                <form id="buyNowForm" action="{{ route('buy_now.redirect') }}" method="POST">
+                <form action="{{ route('buy_now.redirect') }}" method="POST" onsubmit="event.preventDefault(); showWarningModal(this);">
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $detailProduct->id }}">
                     <input type="hidden" name="qty" value="1">
-                    <button type="button" onclick="showWarningModal(document.getElementById('buyNowForm'))" class="btn btn-success" style="width: 208px; height: 55px; background: rgba(6, 124, 194, 0.93); border-radius: 5px; display: flex; justify-content: center; align-items: center; font-family: 'Chakra Petch', sans-serif; font-weight: 500; font-size: 22px; color: #FFFFFF; text-decoration: none;">Buy Now</button>
+                    <button type="submit" class="btn btn-success" style="width: 208px; height: 55px; background: rgba(6, 124, 194, 0.93); border-radius: 5px; display: flex; justify-content: center; align-items: center; font-family: 'Chakra Petch', sans-serif; font-weight: 500; font-size: 22px; color: #FFFFFF; text-decoration: none;">Buy Now</button>
                 </form>
 
-                
-                <form id="addToCartForm" action="{{ route('cart.add', $detailProduct->id) }}" method="POST" class="add-to-cart-form">
+
+                <form action="{{ route('cart.add', $detailProduct->id) }}" method="POST" class="add-to-cart-form" onsubmit="event.preventDefault(); showWarningModal(this);">
                     @csrf
                     <input type="hidden" name="product_id" value="{{ $detailProduct->id }}">
                     <input type="hidden" name="qty" value="1">
-                    <button type="button" onclick="showWarningModal(document.getElementById('addToCartForm'))" class="btn btn-cart" style="width: 208px; height: 55px; border: 1px solid #067CC2; border-radius: 5px; display: flex; justify-content: center; align-items: center; font-family: 'Chakra Petch', sans-serif; font-weight: 500; font-size: 22px; color: #067CC2; text-decoration: none;">Add to Cart</button>
+                    <button type="submit" class="btn btn-cart" style="width: 208px; height: 55px; border: 1px solid #067CC2; border-radius: 5px; display: flex; justify-content: center; align-items: center; font-family: 'Chakra Petch', sans-serif; font-weight: 500; font-size: 22px; color: #067CC2; text-decoration: none;">Add to Cart</button>
                 </form>
             </div>
 
@@ -200,37 +233,39 @@
     <div style="height: 100px;"></div>
 
     {{-- Related Products (Title) --}}
-    @foreach ($relatedProducts as $product)
-    <h2 style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 46px; color: #000000; margin-bottom: 30px;">Related Products</h2>
+    @if ($relatedProducts->count())
+        <section style="margin-top:50px;">
+            <h2 style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:42px;color:#111;margin-bottom:40px;text-align:center;">Related Products</h2>
 
-    {{-- Frame 60: Product Cards DEALS (Related Products) --}}
-    <div class="d-flex justify-content-between" style="width: 100%; gap: 20px;">
-        
-            {{-- Setiap Kartu Produk --}}
-            <div class="d-flex flex-column align-items-start" style="flex: 1; gap: 9px;">
-                <div style="width: 100%; height: 338px; border-radius: 5px; display: flex; justify-content: center; align-items: center;">
-                    <img src="{{ $product->image_url }}" alt="{{ $product->name }}" style="max-height: 100%;">
+            <div style="display:flex;justify-content:center;align-items:center;">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 justify-content-center" style="max-width:1100px;">
+                    @foreach ($relatedProducts as $product)
+                    <div class="col">
+                        <div class="mx-4 card border-0 shadow-sm h-100 text-center" style="border-radius:10px;padding:10px;margin:auto;max-width:100%;">
+                            <div class="p-3" style="height:250px;display:flex;justify-content:center;align-items:center;">
+                                <img src="{{ asset('storage/' . ($product->images[0] ?? 'no-image.png')) }}" alt="{{ $product->name }}" style="max-height:100%;max-width:100%;object-fit:contain;">
+                            </div>
+
+                            <div class="card-body">
+                                <h5 class="card-title" style="font-family:'Chakra Petch',sans-serif;font-weight:700;font-size:22px;margin-bottom:10px;">{{ $product->name }}</h5>
+                                <p class="card-text mb-3" style="font-size:18px;font-weight:600;color:#222;">Rp {{ number_format($product->price, 0, ',', '.') }}</p>
+                                <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="qty" value="1">
+                                    <button type="submit" class="btn btn-dark px-4 py-2" style="border-radius:6px;">Add to Cart</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    @endforeach
                 </div>
-                <h3 style="font-family: 'Chakra Petch', sans-serif; font-weight: 700; font-size: 32px; line-height: 42px; color: #000000; margin-top: 10px; margin-bottom: 5px;">
-                    {{ $product->name }}
-                </h3>
-                <div class="d-flex align-items-center gap-2">
-                    <span style="font-family: 'Montserrat', sans-serif; font-weight: 500; font-size: 24px; line-height: 29px; text-decoration: line-through; color: #787878;">
-                        {{ $product->original_price }}
-                    </span>
-                </div>
-                {{-- Tombol Add to Cart untuk Related Products --}}
-                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="add-to-cart-form">
-                    @csrf
-                    <input type="hidden" name="product_id" value="{{ $product->id }}">
-                    <input type="hidden" name="qty" value="1">
-                    <button type="submit" class="btn btn-cart">Add to Cart</button>
-                </form>
             </div>
-        @endforeach
-    </div>
+        </section>
+        @include('components.popup.warning-modal')
+    @endif
 
-    @include('components.popup.warning-modal')
+
+
     
 @endsection
 

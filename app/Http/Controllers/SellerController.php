@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use Carbon\Carbon;
@@ -24,28 +24,29 @@ use Illuminate\Support\Str;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Storage;
+use App\Models\ProductBundle;
 
 class SellerController extends Controller
 {
     public function viewMainDashboard(){
         $user = Auth::user()->sellerStore;
         $storeId = $user->id;
-        $total_order = DB::table('order_items as oi')
-            ->join('products as p', 'oi.product_id', '=', 'p.id')
+        $total_order = DB::table('Order_Items as oi')
+            ->join('Products as p', 'oi.product_id', '=', 'p.id')
             ->where('p.seller_store_id', $storeId)
             ->distinct('oi.id')
             ->count('oi.id');
         
-        $monthlyRevenue = DB::table('order_items as oi')
-            ->join('products as p', 'oi.product_id', '=', 'p.id')
-            ->join('orders as o', 'oi.order_id', '=', 'o.id')
+        $monthlyRevenue = DB::table('Order_Items as oi')
+            ->join('Products as p', 'oi.product_id', '=', 'p.id')
+            ->join('Orders as o', 'oi.order_id', '=', 'o.id')
             ->where('p.seller_store_id', $storeId)
-            ->whereRaw('EXTRACT(MONTH FROM o.ordered_at) = ?', [now()->month])
-            ->whereRaw('EXTRACT(YEAR FROM o.ordered_at) = ?', [now()->year])
+            ->whereMonth('o.ordered_at', now()->month)
+            ->whereYear('o.ordered_at', now()->year)
             ->selectRaw('COALESCE(SUM(oi.subtotal), 0) as revenue')
             ->value('revenue');
 
-        $activeProducts = DB::table('products')
+        $activeProducts = DB::table('Products')
             ->where('seller_store_id', $storeId)
             ->where('stock', '>', 0)
             ->count();
@@ -55,13 +56,13 @@ class SellerController extends Controller
             ->avg('rating');
 
         $storeRating = $storeRating ? number_format($storeRating, 1) : 0;
-        $sales = DB::table('order_items as oi')
-            ->join('products as p', 'oi.product_id', '=', 'p.id')
-            ->join('orders as o', 'oi.order_id', '=', 'o.id')
+        $sales = DB::table('Order_Items as oi')
+            ->join('Products as p', 'oi.product_id', '=', 'p.id')
+            ->join('Orders as o', 'oi.order_id', '=', 'o.id')
             ->where('p.seller_store_id', $storeId)
             ->selectRaw('
-                EXTRACT(MONTH FROM o.ordered_at)::integer as month,
-                EXTRACT(YEAR FROM o.ordered_at)::integer as year,
+                MONTH(o.ordered_at) as month,
+                YEAR(o.ordered_at) as year,
                 SUM(oi.subtotal) as revenue
             ')
             ->groupBy('year', 'month')
@@ -84,11 +85,8 @@ class SellerController extends Controller
 
         $data = array_values($data);
         
-        // Add Seminar Data
-        $total_seminar = \App\Models\Seminar::count();
-        $total_seminar_registration = \App\Models\SeminarRegistration::count();
 
-        return view('seller.seller-dashboard', compact('total_order', 'monthlyRevenue', 'activeProducts', 'storeRating', 'labels', 'data', 'total_seminar', 'total_seminar_registration'));
+        return view('seller.seller-dashboard', compact('total_order', 'monthlyRevenue', 'activeProducts', 'storeRating', 'labels', 'data'));
     }
 
     public function store(Request $request)
@@ -326,6 +324,39 @@ class SellerController extends Controller
         return view('seller.product', compact('product', 'storelogo'));
     }
 
+    public function show($id)
+    {
+        $product = Product::with('category')->findOrFail($id);
+        return view('seller.partials.product-detail', compact('product'));
+    }
+
+    public function destroy(Product $product)
+    {
+        if ($product->seller_store_id !== auth()->user()->sellerStore->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized'
+            ], 403);
+        }
+
+        if (!empty($product->images)) {
+            foreach ($product->images as $img) {
+                \Storage::disk('public')->delete($img);
+            }
+        }
+
+        if ($product->type === 'bundle') {
+            $product->bundleItems()->delete();
+        }
+
+        $product->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product deleted'
+        ]);
+    }
+
     public function viewAddProductForm(){
         $categories = Category::all();
         $shippings = Shipping::all();
@@ -438,13 +469,30 @@ class SellerController extends Controller
         }
     }
 
+    public function quickUpdate(Request $request, Product $product)
+    {
+        if ($product->seller_store_id !== auth()->user()->sellerStore->id) {
+            return response()->json(['success' => false], 403);
+        }
 
-    public function deleteProd(Product $product){
-         $seller = auth()->user()->sellerStore;
-         abort_unless($product->seller_store_id == $seller->id, 403, 'Anda tidak memiliki akses untuk mengubah product ini!');
-         $product->delete();
-         return back()->with('success', 'Berhasil menghapus product.');
+        $request->validate([
+            'name' => 'required|string',
+            'price' => 'required|numeric|min:1',
+            'stock' => 'required|integer|min:0',
+        ]);
+
+        $product->update(
+            $request->only('name', 'price', 'stock')
+        );
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Product updated'
+        ]);
     }
+
+
+
 
     public function updateStock(Request $request, Product $product){
         $seller = auth()->user()->sellerStore;
@@ -809,6 +857,104 @@ class SellerController extends Controller
             ], 500);
         }
     }
+    public function createBundle()
+    {
+        $seller = auth()->user()->sellerStore;
+
+        $products = Product::where('seller_store_id', $seller->id)
+            ->where('type', '!=', 'bundle')
+            ->where('status', 'active')
+            ->get();
+
+        $categories = Category::all();
+
+        return view('seller.add-new-bundle', compact('products', 'categories'));
+    }
+
+    public function storeBundle(Request $request)
+    {
+
+        $seller = auth()->user()->sellerStore;
+
+        if (! $seller) {
+            abort(403, 'Seller store not found');
+        }
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'price' => 'required|numeric|min:1',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.qty' => 'required|integer|min:1',
+            'images' => 'nullable|image|max:2048',
+            'specs.key.*' => 'nullable|string',
+            'specs.value.*' => 'nullable|string',
+            'category_id' => 'nullable|exists:categories,id',
+        ]);
+
+        DB::transaction(function () use ($request, $seller) {
+
+            $specs = [];
+
+            if ($request->has('specs')) {
+                foreach ($request->specs['key'] as $i => $key) {
+                    $value = $request->specs['value'][$i] ?? null;
+
+                    if ($key && $value) {
+                        $specs[$key] = $value;
+                    }
+                }
+            }
+
+            $imagePath = null;
+            if ($request->hasFile('images')) {
+                $imagePath = $request->file('images')
+                    ->store('product_bundles', 'public');
+            }
+
+            $bundle = Product::create([
+                'seller_store_id' => $seller->id,
+                'category_id' => $request->category_id,
+                'brand' => 'Bundle',
+                'name' => $request->name,
+                'type' => 'bundle',
+                'price' => $request->price,
+                'original_price' => $this->calculateOriginalPrice($request->items),
+                'stock' => 0,
+                'status' => 'active',
+                'SKU' => 'BUNDLE-' . strtoupper(Str::random(8)),
+                'images' => $imagePath ? [$imagePath] : [],
+                'description' => $request->description,
+                'specifications' => json_encode($specs),
+            ]);
+
+            foreach ($request->items as $item) {
+                ProductBundle::create([
+                    'bundle_product_id' => $bundle->id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['qty'],
+                ]);
+            }
+        });
+
+        return redirect()
+            ->route('seller.products')
+            ->with('success', 'Bundle berhasil dibuat');
+    }
+
+
+    private function calculateOriginalPrice(array $items): int
+    {
+        $total = 0;
+
+        foreach ($items as $item) {
+            $product = Product::find($item['product_id']);
+            $total += $product->price * $item['qty'];
+        }
+
+        return $total;
+    }
+
 
 
 }

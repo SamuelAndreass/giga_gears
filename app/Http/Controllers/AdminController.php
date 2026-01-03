@@ -22,31 +22,21 @@ class AdminController extends Controller
         $t_seller = SellerStore::count();
         $t_transaction = Order::where('status', 'completed')->sum('total_amount');
         $recent_order = OrderItem::all()->take(5);
-        
+
         // Seminar Data
         $t_seminar = Seminar::count();
         $t_seminar_registration = \App\Models\SeminarRegistration::count();
         $recent_seminars = Seminar::orderBy('created_at', 'desc')->take(5)->get();
-
+        
         $customer_growth = User::select(
-            DB::raw("DATE_TRUNC('month', created_at)::date as month"),
+            DB::raw('MONTH(created_at) as month'),
             DB::raw('COUNT(*) as total')
         )
         ->where('role', 'customer')
-        ->whereRaw('EXTRACT(YEAR FROM created_at) = ?', [date('Y')])
-        ->groupBy(DB::raw("DATE_TRUNC('month', created_at)::date"))
-        ->orderBy(DB::raw("DATE_TRUNC('month', created_at)::date"))
-        ->get();
-
-        // Convert to array with month number as key
-        $growth_array = [];
-        foreach ($customer_growth as $item) {
-            $month_num = \Carbon\Carbon::parse($item->month)->month;
-            $growth_array[$month_num] = $item->total;
-        }
-        
-        // Convert to collection for view consistency
-        $customer_growth = collect($growth_array);
+        ->whereYear('created_at', date('Y'))
+        ->groupBy('month')
+        ->orderBy('month')
+        ->pluck('total', 'month');
 
         $months = [
             'January', 'February', 'March', 'April', 'May', 'June',
@@ -55,7 +45,7 @@ class AdminController extends Controller
 
         $customerData = [];
         foreach ($months as $index => $m) {
-            $customerData[] = $customer_growth->get($index + 1, 0);
+            $customerData[] = $customer_growth[$index + 1] ?? 0;
         }
 
         $revenues = DB::table('order_items')
@@ -77,7 +67,98 @@ class AdminController extends Controller
         $percentages = collect($values)->map(fn($v) => $total > 0 ? round(($v / $total) * 100, 2) : 0)->toArray();
 
 
-        return view('admin.dashboard', compact('t_customer', 't_seller', 't_transaction', 'customer_growth' ,'recent_order', 'labels', 'values', 'percentages', 'revenues', 'total', 'customerData', 'months', 't_seminar', 't_seminar_registration', 'recent_seminars'));
+        return view('admin.dashboard', compact('t_customer', 't_seller', 't_transaction', 'customer_growth' ,'recent_order', 'labels', 'values', 'percentages', 'revenues', 'total', 'customerData', 'months'));
+    }
+
+    public function workshopIndex(){
+        $workshops = Seminar::all();
+        return view('admin.workshop', compact('workshops'));
+    }
+
+    public function workshopStore(Request $request){
+        $request->validate([
+            'title' => 'required|string',
+            'description' => 'nullable|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
+            'instructor' => 'required|string',
+            'capacity' => 'required|integer|min:1',
+            'location' => 'required|string',
+            'status' => 'required|in:upcoming,ongoing,finished,cancelled',
+            'requirements' => 'nullable|string',
+        ]);
+
+        Seminar::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'instructor' => $request->instructor,
+            'capacity' => $request->capacity,
+            'location' => $request->location,
+            'status' => $request->status,
+            'requirements' => $request->requirements,
+        ]);
+
+        return redirect()->route('admin.workshops.index')->with('success', 'Workshop berhasil ditambahkan');
+    }
+
+    public function workshopDestroy(Seminar $workshop){
+        $workshop->delete();
+        return redirect()->route('admin.workshops.index')->with('success', 'Workshop berhasil dihapus');
+    }
+
+    public function workshopJson(Seminar $workshop){
+        return response()->json([
+            'id' => $workshop->id,
+            'title' => $workshop->title,
+            'description' => $workshop->description,
+            'start_date' => $workshop->start_date->format('Y-m-d'),
+            'start_time' => $workshop->start_date->format('H:i'),
+            'end_date' => $workshop->end_date->format('Y-m-d'),
+            'end_time' => $workshop->end_date->format('H:i'),
+            'instructor' => $workshop->instructor,
+            'capacity' => $workshop->capacity,
+            'location' => $workshop->location,
+            'status' => $workshop->status,
+            'requirements' => $workshop->requirements,
+            'image_url' => $workshop->image_url,
+        ]);
+    }
+
+    public function workshopUpdate(Request $request, Seminar $workshop){
+        $request->validate([
+            'title' => 'required|string',
+            'description' => 'nullable|string',
+            'start_date' => 'required|date',
+            'start_time' => 'required|date_format:H:i',
+            'end_date' => 'required|date',
+            'end_time' => 'required|date_format:H:i',
+            'instructor' => 'required|string',
+            'capacity' => 'required|integer|min:1',
+            'location' => 'required|string',
+            'status' => 'required|in:upcoming,ongoing,finished,cancelled',
+            'requirements' => 'nullable|string',
+            'image_url' => 'nullable|url',
+        ]);
+
+        $startDateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $request->start_date . ' ' . $request->start_time);
+        $endDateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $request->end_date . ' ' . $request->end_time);
+
+        $workshop->update([
+            'title' => $request->title,
+            'description' => $request->description,
+            'start_date' => $startDateTime,
+            'end_date' => $endDateTime,
+            'instructor' => $request->instructor,
+            'capacity' => $request->capacity,
+            'location' => $request->location,
+            'status' => $request->status,
+            'requirements' => $request->requirements,
+            'image_url' => $request->image_url,
+        ]);
+
+        return redirect()->route('admin.workshops.index')->with('success', 'Workshop berhasil diperbarui');
     }
 
     public function viewUser(Request $request){
@@ -502,97 +583,6 @@ class AdminController extends Controller
         });
 
         return view('admin.seller-detail-view');
-    }
-
-    public function workshopIndex(){
-        $workshops = Seminar::all();
-        return view('admin.workshop', compact('workshops'));
-    }
-
-    public function workshopStore(Request $request){
-        $request->validate([
-            'title' => 'required|string',
-            'description' => 'nullable|string',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date|after:start_date',
-            'instructor' => 'required|string',
-            'capacity' => 'required|integer|min:1',
-            'location' => 'required|string',
-            'status' => 'required|in:upcoming,ongoing,finished,cancelled',
-            'requirements' => 'nullable|string',
-        ]);
-
-        Seminar::create([
-            'title' => $request->title,
-            'description' => $request->description,
-            'start_date' => $request->start_date,
-            'end_date' => $request->end_date,
-            'instructor' => $request->instructor,
-            'capacity' => $request->capacity,
-            'location' => $request->location,
-            'status' => $request->status,
-            'requirements' => $request->requirements,
-        ]);
-
-        return redirect()->route('admin.workshops.index')->with('success', 'Workshop berhasil ditambahkan');
-    }
-
-    public function workshopDestroy(Seminar $workshop){
-        $workshop->delete();
-        return redirect()->route('admin.workshops.index')->with('success', 'Workshop berhasil dihapus');
-    }
-
-    public function workshopJson(Seminar $workshop){
-        return response()->json([
-            'id' => $workshop->id,
-            'title' => $workshop->title,
-            'description' => $workshop->description,
-            'start_date' => $workshop->start_date->format('Y-m-d'),
-            'start_time' => $workshop->start_date->format('H:i'),
-            'end_date' => $workshop->end_date->format('Y-m-d'),
-            'end_time' => $workshop->end_date->format('H:i'),
-            'instructor' => $workshop->instructor,
-            'capacity' => $workshop->capacity,
-            'location' => $workshop->location,
-            'status' => $workshop->status,
-            'requirements' => $workshop->requirements,
-            'image_url' => $workshop->image_url,
-        ]);
-    }
-
-    public function workshopUpdate(Request $request, Seminar $workshop){
-        $request->validate([
-            'title' => 'required|string',
-            'description' => 'nullable|string',
-            'start_date' => 'required|date',
-            'start_time' => 'required|date_format:H:i',
-            'end_date' => 'required|date',
-            'end_time' => 'required|date_format:H:i',
-            'instructor' => 'required|string',
-            'capacity' => 'required|integer|min:1',
-            'location' => 'required|string',
-            'status' => 'required|in:upcoming,ongoing,finished,cancelled',
-            'requirements' => 'nullable|string',
-            'image_url' => 'nullable|url',
-        ]);
-
-        $startDateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $request->start_date . ' ' . $request->start_time);
-        $endDateTime = \Carbon\Carbon::createFromFormat('Y-m-d H:i', $request->end_date . ' ' . $request->end_time);
-
-        $workshop->update([
-            'title' => $request->title,
-            'description' => $request->description,
-            'start_date' => $startDateTime,
-            'end_date' => $endDateTime,
-            'instructor' => $request->instructor,
-            'capacity' => $request->capacity,
-            'location' => $request->location,
-            'status' => $request->status,
-            'requirements' => $request->requirements,
-            'image_url' => $request->image_url,
-        ]);
-
-        return redirect()->route('admin.workshops.index')->with('success', 'Workshop berhasil diperbarui');
     }
 
 }

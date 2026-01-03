@@ -1,3 +1,33 @@
+<style>
+    .warning-article {
+    text-align: left;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 15px;
+    color: #444;
+    margin-bottom: 24px;
+}
+
+.warning-article ul {
+    padding-left: 18px;
+    margin: 16px 0;
+}
+
+.warning-article li {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.warning-note {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: #FFF4F4;
+    border-left: 4px solid #FF4757;
+    font-size: 13px;
+    color: #B91C1C;
+    border-radius: 6px;
+}
+</style>
+
 <div id="warningModal" class="warning-modal-overlay" style="display: none;">
     <div class="warning-modal-content">
         <div class="warning-icon-container">
@@ -7,11 +37,26 @@
                 <line x1="12" y1="17" x2="12.01" y2="17"></line>
             </svg>
         </div>
-        <h2 class="warning-title">Apakah kamu yakin?</h2>
-        <p class="warning-message">Hati-Hati barang palsu dan penipuan</p>
+        <h2 class="warning-title">Tips Aman Berbelanja</h2>
+        <div class="warning-article">
+            <p>
+                Demi keamanan dan kenyamanan kamu, mohon perhatikan hal-hal berikut sebelum melanjutkan pembelian:
+            </p>
+
+            <ul>
+                <li>Pastikan deskripsi produk sesuai dengan kebutuhan kamu</li>
+                <li>Periksa reputasi penjual dan ulasan pembeli lain</li>
+                <li>Waspadai harga yang terlalu murah di luar kewajaran</li>
+                <li>Gunakan fitur chat untuk bertanya sebelum membeli</li>
+            </ul>
+
+            <div class="warning-note">
+                GigaGears tidak bertanggung jawab atas transaksi di luar sistem resmi.
+            </div>
+        </div>
         <div class="warning-buttons">
             <button type="button" class="btn-cancel" onclick="closeWarningModal()">Batal</button>
-            <button type="button" class="btn-confirm" onclick="confirmWarningAction()">Ya, Lanjutkan</button>
+            <button type="button" class="btn-confirm" onclick="confirmWarningAction()">Saya Mengerti & Lanjutkan</button>
         </div>
     </div>
 </div>

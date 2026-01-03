@@ -173,11 +173,45 @@
                     {{ $product->name }}
                 </h4>
                 <p style="font-family:'Montserrat',sans-serif;font-size:24px;color:#000000;">
-                    Rp. {{ number_format($product->original_price, 2) }}
+                    Rp. {{ number_format($product->price, 2) }}
                 </p>
             </a>
         @endforeach
     </div>
+
+
+    @if(isset($bundles) && $bundles->count())
+        <div class="mt-5 text-center">
+            <h2>🔥 Bundle Deals</h2>
+            <p>Best-value bundles featuring top product combinations.</p>
+        </div>
+
+        <div class="d-flex justify-content-center flex-wrap gap-4 mt-4">
+            @foreach ($bundles as $bundle)
+
+            <div class="card p-3 text-decoration-none text-dark" style="width:32%; border: none;">
+                <img src="{{ asset('storage/' . ($bundle->images[0] ?? 'no-image.png')) }}" height="300px">
+
+                <h4 class="mt-3">{{ $bundle->name }}</h4>
+                <p>{{ $bundle->description }}</p>
+
+                <div class="d-flex justify-content-between">
+                    @if($bundle->original_price)
+                        <del style="color: red">Rp {{ number_format($bundle->original_price) }}</del>
+                    @endif
+                    <strong>Rp {{ number_format($bundle->price) }}</strong>
+                </div>
+
+                <a href="{{ route('product.detail', $bundle->id) }}" class="btn btn-primary mt-3">
+                    View Bundle
+                </a>
+            </div>
+
+            @endforeach
+        </div>
+    @endif
+
+
 
     <hr style="border:0;height:3px;background:linear-gradient(to right,#00B4D8,#0077B6,#023E8A);border-radius:10px;margin:80px 0;">
 

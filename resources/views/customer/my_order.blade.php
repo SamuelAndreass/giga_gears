@@ -7,36 +7,29 @@
 @section('header')
     <style>
         .header-wrapper {
-            width: 100%;
-            height: 90px;
-            padding-top: 20px;
-            background: #FFFFFF;
-            border-bottom: 1px solid #eee;
+            width: 100%; height: 90px; padding-top: 20px; background: #FFFFFF; border-bottom: 1px solid #eee;
         }
         .main-navbar {
-            width: 1280px;
-            max-width: 90%;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            width: 1280px; max-width: 90%; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;
         }
+        .nav-link-active { color: #067CC2 !important; font-weight: 600; }
     </style>
 
     <div class="header-wrapper">
         <div class="page-container main-navbar">
             <img src="{{ asset('images/logo GigaGears.png') }}" alt="GIGAGEARS Logo" width="197" height="24">
-            <div class="d-flex" style="gap: 45px; font-size:22px; align-items: center;">
+            <div class="d-flex" style="gap: 71px;">
                 <div class="d-flex gap-3">
-                    <a href="{{ route('dashboard') }}" style="color: #000000; text-decoration: none; white-space: nowrap;">Home</a>
-                    <a href="{{ route('products.index') }}" style="color: #000000; text-decoration: none; white-space: nowrap;">Products</a>
-                    <a href="/#about-us-section" style="color: #000000; text-decoration: none; white-space: nowrap;">About Us</a>
-                    <a href="{{ route('orders.index') }}" style="color: #067CC2; text-decoration: none; white-space: nowrap;">My Order</a>
-                    <a href="{{ route('community.index') }}" style="color: #000000; text-decoration: none; white-space: nowrap;">Communities</a>
-                    <a href="{{ route('seminar.index') }}" style="color: #000000; text-decoration: none; white-space: nowrap;">Seminars</a>
+                    <a href="{{ route('dashboard') }}" style="color: #000; font-size:25px; text-decoration:none;">Home</a>
+                    <a href="{{ route('products.index') }}" style="color: #000; font-size:25px; text-decoration:none;">Products</a>
+                    <a href="/#about-us-section" style="color: #000; font-size:25px; text-decoration:none;">About Us</a>
+                    <a href="{{ route('orders.index') }}" style="color: #067CC2; font-size:25px; text-decoration:none;">My Order</a>
+                    <a href="{{ route('community.index') }}" style="color: #000; font-size:25px; text-decoration:none;">Communities</a>
+                    <a href="{{ route('seminar.index') }}" style="color: #000; font-size:25px; text-decoration:none;">Seminar</a>
                     <a href="{{ route('cart.index') }}" 
-                        class="position-relative text-decoration-none text-dark" style="white-space: nowrap;">
-                        <i class="bi bi-cart3"></i>
+                        class="position-relative text-decoration-none 
+                        {{ request()->routeIs('cart.index') ? 'text-primary fw-bold' : 'text-dark' }}">
+                        <i class="bi bi-cart3 fs-4"></i>
                         @if($cartCount > 0)
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger fs-6">
                                 {{ $cartCount }}
@@ -46,11 +39,9 @@
                 </div>
             </div>
 
-            <a href="{{ route('profile.edit') }}" class="d-flex align-items-center justify-content-center" style="border: 1px solid #000000; border-radius: 5px; padding: 10px; width: 135px; height: 52px; text-decoration: none; color: #000;">
-                <div class="d-flex align-items-center" style="gap: 9px;">
-                    <span>Profile</span>
-                    <img src="{{ asset(Auth::user()->customerProfile?->avatar_path ?? 'images/logo foto profile.png') }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
-                </div>
+            <a href="{{ route('profile.edit') }}" style="border: 1px solid #000; border-radius: 5px; padding: 10px 15px; color: #000; text-decoration: none;">
+                <span>Profile</span>
+                <img src="{{ asset(Auth::user()->customerProfile->avatar_path ?? 'images/pp.png') }}" alt="Profile" width="32" height="32" style="border-radius:50%;margin-left:9px;">
             </a>
         </div>
     </div>
@@ -150,16 +141,12 @@
                                 <td class="text-secondary">{{ $order->created_at->format('d/m/Y') }}</td>
                                 <td class="text-start">
                                      @php
+                                        // pastikan $order->products berisi koleksi (array dari relasi)
                                         $firstProduct = $order->products[0]->name ?? 'Unnamed Product';
-                                        $productImage = $order->products[0]->image ?? null;
-                                        $imagePath = 'no-image.png';
-                                        if ($productImage) {
-                                            $imagePath = is_array($productImage) ? ($productImage[0] ?? 'no-image.png') : $productImage;
-                                        }
                                         $otherCount = count($order->products) - 1;
                                     @endphp
                                     <div class="d-flex align-items-center gap-3">
-                                        <img src="{{ asset('storage/' . $imagePath) }}"
+                                        <img src="{{ asset('storage/' . ($order->products[0]->image[0] ?? 'no-image.png')) }}"
                                             alt="{{ $firstProduct }}" 
                                             style="width:55px; height:55px; border-radius:5px; border:1px solid #eee; object-fit:contain;">
                                         <div>

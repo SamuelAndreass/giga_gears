@@ -19,6 +19,9 @@ return new class extends Migration
             $table->integer('qty');
             $table->decimal('price', 12, 2);
             $table->decimal('subtotal', 12, 2);
+            $table->bigInteger('price_snapshot');
+            $table->json('meta')->nullable();
+
         });
     }
 

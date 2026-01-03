@@ -28,6 +28,7 @@ class OrderSeeder extends Seeder
                     'total_amount' => 0,
                     'status' => Arr::random(['pending','processing','completed']),
                     'ordered_at' => now()->subDays(rand(0,60)),
+                    'payment_method' => Arr::random(['Credit Card','Bank Transfer','COD','E-Wallet']),
                 ]);
 
                 // choose some products (simulate multi-seller)
@@ -36,18 +37,18 @@ class OrderSeeder extends Seeder
                 $subtotal = 0;
                 foreach ($products as $p) {
                     $qty = rand(1,2);
-                    $unit = $p->original_price;
                     OrderItem::create([
                         'order_id' => $order->id,
                         'product_id' => $p->id,
                         'qty' => $qty,
-                        'price' => $unit,
-                        'subtotal' => $unit * $qty,
+                        'price' => $p->price,
+                        'subtotal' => $p->price * $qty,
                     ]);
-                    $subtotal += ($unit * $qty);
+                    $subtotal += ($p->price * $qty);
                 }
 
                 // update order total (you may want to add shipping, tax)
+                $order->subtotal = $subtotal;
                 $order->total_amount = $subtotal;
                 $order->save();
 

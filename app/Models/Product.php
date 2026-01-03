@@ -12,12 +12,12 @@ class Product extends Model
         'product_code','name','description','category_id','seller_store_id',
         'original_price','discount_price','discount_percentage','images',
         'colors','specifications','features','stock','brand','rating','review_count',
-        'is_featured','variants','SKU','weight','diameter','status','created_at','updated_at'
+        'is_featured','variants','SKU','weight','diameter','status','created_at','updated_at','type','meta','price'
     ];
     protected $casts = [
         'images' => 'array', 'colors' => 'array', 'specifications' => 'array',
         'features' => 'array', 'original_price' => 'decimal:2', 'discount_price' => 'decimal:2',
-        'rating' => 'decimal:1', 'review_count' => 'integer', 'is_featured' => 'boolean', 'stock' => 'integer','variants' => 'array'
+        'rating' => 'decimal:1', 'review_count' => 'integer', 'is_featured' => 'boolean', 'stock' => 'integer','variants' => 'array','type' => 'string'
     ];
     public function category() { return $this->belongsTo(Category::class); }
     public function reviews() { return $this->hasMany(ProductReview::class); }
@@ -25,7 +25,12 @@ class Product extends Model
     public function CartItems(){ return $this->hasMany(CartItem::class);}
     public function sellerStore(){ return $this->belongsTo(SellerStore::class);}
 
+    public function bundleItems() { return $this->hasMany(ProductBundle::class, 'bundle_product_id'); }
 
+    public function isBundle()
+    {
+        return $this->type === 'bundle';
+    }
     protected static function boot() {
         parent::boot();
         static::saving(function ($product) {

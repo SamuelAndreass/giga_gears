@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('sku')->nullable();
             $table->decimal('price', 12, 2);
             $table->decimal('subtotal', 12, 2);
+            $table->json('meta')->nullable();
         });
     }
 

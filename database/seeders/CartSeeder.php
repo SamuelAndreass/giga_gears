@@ -35,7 +35,7 @@ class CartSeeder extends Seeder
             $total = 0;
             foreach ($items as $p) {
                 $qty = rand(1, 3);
-                $unit = $p->original_price;
+                $unit = $p->price;
                 $subtotal = $unit * $qty;
 
                 CartItem::create([
@@ -43,6 +43,7 @@ class CartSeeder extends Seeder
                     'product_id' => $p->id,
                     'qty' => $qty,
                     'price' => $unit,
+                    'price_snapshot' => $unit,
                     'subtotal' => $subtotal,
                 ]);
 

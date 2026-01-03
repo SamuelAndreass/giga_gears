@@ -117,10 +117,19 @@
                 </div>
               </div>
               <div class="col-12 col-md-auto justify-self-end ms-md-auto">
-                  <a href="{{ route('seller.view.add.product') }}" class="btn btn-orange d-flex align-items-center gap-2">
-                    <i class="bi bi-plus-lg"></i> Add Product
-                  </a>
-                </div>
+                <div class="row">
+                  <div class="col-auto">
+                    <a href="{{ route('seller.view.add.product') }}" class="btn btn-orange d-flex align-items-center gap-2">
+                      <i class="bi bi-plus-lg"></i> Add Product
+                    </a>
+                  </div>
+                  <div class="col-auto">
+                    <a href="{{ route('seller.view.add.bundle') }}" class="btn btn-orange d-flex align-items-center gap-2">
+                      <i class="bi bi-plus-lg"></i> Add Bundle
+                    </a>
+                  </div>
+                </div>                  
+              </div>
             </div>
 
           </div>
@@ -136,6 +145,7 @@
                   <th>Price</th>
                   <th class="text-center">Stock</th>
                   <th>Status</th>
+                  <th style="width: 120px;">Actions</th>
                 </tr>
               </thead>
               <tbody id="tbodyProduct">
@@ -146,9 +156,12 @@
                           <div class="d-flex align-items-center gap-3">
                               <div class="product-thumb"><i class="bi bi-box-seam"></i></div>
                               <div>
-                                  <div class="fw-bold text-dark">
+                                @if ($p->type === 'bundle')
+                                  <div class="small text-muted mb-1">[Bundle]</div>
+                                @endif
+                                <div class="fw-bold text-dark">
                                       {{ $p->name }}
-                                  </div>
+                                </div>
                                   <div class="small text-muted">
                                       ID: {{ $p->id }}
                                   </div>
@@ -165,7 +178,7 @@
 
                       {{-- PRICE --}}
                       <td class="fw-bold">
-                          Rp{{ number_format($p->original_price, 0, ',', '.') }}
+                          Rp{{ number_format($p->price, 0, ',', '.') }}
                       </td>
 
                       {{-- STOCK --}}
@@ -181,11 +194,77 @@
                       </td>
 
                       {{-- ACTION BUTTONS --}}
-
+                      <td>
+                        <div class="d-flex gap-2">
+                          <button class="btn btn-sm btn-outline-primary" data-id="{{ $p->id }}" onclick="viewProduct({{ $p->id }})">
+                            <i class="bi bi-eye"></i>
+                          </button>
+                          <button class="btn btn-sm btn-outline-warning" onclick="openEditModal({{ $p->id }}, '{{ $p->name }}', {{ $p->price }}, {{ $p->stock }})">
+                            <i class="bi bi-pencil"></i>
+                          </button>
+                          <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct({{ $p->id }})">
+                            <i class="bi bi-trash"></i>
+                          </button>
+                        </div>
+                      </td>
                   </tr>
                 @endforeach
               </tbody>
             </table>
+            <div id="alertBox"></div>
+            <!-- Modal -->
+
+            <div class="modal fade" id="editProductModal" tabindex="-1">
+              <div class="modal-dialog">
+                <div class="modal-content">
+
+                  <div class="modal-header">
+                    <h5 class="modal-title">Edit Product</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+
+                  <div class="modal-body">
+                    <input type="hidden" id="edit_id">
+
+                    <div class="mb-3">
+                      <label>Nama</label>
+                      <input type="text" id="edit_name" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                      <label>Harga</label>
+                      <input type="number" id="edit_price" class="form-control">
+                    </div>
+
+                    <div class="mb-3">
+                      <label>Stock</label>
+                      <input type="number" id="edit_stock" class="form-control">
+                    </div>
+                  </div>
+
+                  <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-warning" onclick="saveEdit()">Save</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="modal fade" id="productDetailModal" tabindex="-1">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Product Detail</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div id="productDetailContent" class="text-center py-3 text-muted">Loading...</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
           <div class="d-flex justify-content-between align-items-center px-3 px-md-4 py-3 border-top">
             <div class="small text-muted"><span id="countInfo">{{ $product->total() }}</span> results</div>
@@ -213,6 +292,87 @@
 
     if(btnToggle) btnToggle.addEventListener('click', toggleSidebar);
     if(overlay) overlay.addEventListener('click', toggleSidebar);
+
+    function viewProduct(id) {
+      const modal = new bootstrap.Modal(document.getElementById('productDetailModal'));
+      const content = document.getElementById('productDetailContent');
+      content.innerHTML = 'Loading...';
+
+      fetch(`/seller/products/${id}`)
+        .then(res => res.text())
+        .then(html => {
+          content.innerHTML = html;
+          modal.show();
+        })
+        .catch(() => {
+          content.innerHTML = '<p class="text-danger">Failed to load product details.</p>';
+        });
+    }
+
+    function deleteProduct(id) {
+      if (!confirm('Hapus produk ini?')) return;
+
+      fetch(`/seller/seller/products/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRF-TOKEN': '{{ csrf_token() }}',
+          'Accept': 'application/json'
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document
+            .querySelector(`button[onclick="deleteProduct(${id})"]`)
+            .closest('tr')
+            .remove();
+            alert('Produk berhasil dihapus.');
+        } else {
+          alert(data.message || 'Gagal menghapus produk.');
+        }
+      })
+      .catch(() => alert('Server error'));
+    }
+
+    let editModal = new bootstrap.Modal(
+    document.getElementById('editProductModal')
+ );
+
+    function openEditModal(id, name, price, stock) {
+        document.getElementById('edit_id').value = id;
+        document.getElementById('edit_name').value = name;
+        document.getElementById('edit_price').value = price;
+        document.getElementById('edit_stock').value = stock;
+
+        editModal.show();
+    }
+
+    function saveEdit() {
+        const id = document.getElementById('edit_id').value;
+
+        fetch(`/seller/products/${id}/quick-update`, {
+            method: 'PUT',
+            headers: {
+                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: document.getElementById('edit_name').value,
+                price: document.getElementById('edit_price').value,
+                stock: document.getElementById('edit_stock').value
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        });
+    }
+
   </script>
 
 </body>

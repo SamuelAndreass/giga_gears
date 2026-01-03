@@ -16,6 +16,7 @@ class CategorySeeder extends Seeder
             ['name'=>'Accessories','slug'=>'accessories','description'=>'Aksesoris pendukung gadget seperti charger, headset, dan casing'],
             ['name'=>'Gaming','slug'=>'gaming','description'=>'Perangkat dan aksesoris gaming untuk PC, konsol, dan mobile'],
             ['name'=>'Mac','slug'=>'mac','description'=>'Produk Apple Mac seperti MacBook, iMac, dan aksesorisnya'],
+            ['name'=>'Books','slug'=>'books','description'=>'Berbagai jenis buku dari fiksi hingga non-fiksi']
         ];
 
 

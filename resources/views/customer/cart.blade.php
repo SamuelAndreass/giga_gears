@@ -3,38 +3,60 @@
 
 @section('content')
 @section('header')
+
+
+
     <style>
         .header-wrapper {
             width: 100%;
             height: 90px;
-            padding-top: 20px;
+            padding-top: 20px; 
             background: #FFFFFF;
             border-bottom: 1px solid #eee;
         }
         .main-navbar {
             width: 1280px;
-            max-width: 90%;
-            margin: 0 auto;
+            max-width: 90%; 
+            margin: 0 auto; 
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+        .back-icon {
+            position: relative;
+            width: 43px;
+            height: 43px;
+            left: 0;
+            top: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #717171;
+            border-radius: 9999px;
+            text-decoration: none;
+            z-index: 20;
+            transform: translateX(-50%); 
+        }
     </style>
     
     <div class="header-wrapper">
+        
+        {{-- Frame 19: NAVBAR --}}
         <div class="page-container main-navbar">
             <img src="{{ asset('images/logo GigaGears.png') }}" alt="GIGAGEARS Logo" width="197" height="24">
-            <div class="d-flex" style="gap: 45px; font-size:22px; align-items: center;">
-                <div class="d-flex gap-3">
-                    <a href="{{ route('dashboard') }}" style="color: #000000; text-decoration: none; white-space: nowrap;">Home</a>
-                    <a href="{{ route('products.index') }}" style="color: #000000; text-decoration: none; white-space: nowrap;">Products</a>
-                    <a href="/#about-us-section" style="color: #000000; text-decoration: none; white-space: nowrap;">About Us</a>
-                    <a href="{{ route('orders.index') }}" style="color: #000000; text-decoration: none; white-space: nowrap;">My Order</a>
-                    <a href="{{ route('community.index') }}" style="color: #000000; text-decoration: none; white-space: nowrap;">Communities</a>
-                    <a href="{{ route('seminar.index') }}" style="color: #000000; text-decoration: none; white-space: nowrap;">Seminars</a>
+            
+            {{-- Frame 16: Links --}}
+            <div class="d-flex" style="gap: 71px; font-size:25px">
+                <div class="d-flex gap-5">
+                    <a href="{{ route('dashboard') }}" style="color: #000000; text-decoration: none;">Home</a>
+                    <a href="{{ route('products.index') }}" style="color: #000000; text-decoration: none;">Products</a>
+                    <a href="/#about-us-section" style="color: #000000; text-decoration: none;">About Us</a>
+                    <a href="{{ route('orders.index') }}" style="color: #000000; text-decoration: none;">My Order</a>
+                    <a href="{{ route('community.index') }}" style="color: #000000; text-decoration: none;">Communities</a>
                     <a href="{{ route('cart.index') }}" 
-                        class="position-relative text-decoration-none text-primary fw-bold" style="white-space: nowrap;">
-                        <i class="bi bi-cart3"></i>
+                        class="position-relative text-decoration-none 
+                        {{ request()->routeIs('cart.index') ? 'text-primary fw-bold' : 'text-dark' }}">
+                        <i class="bi bi-cart3 fs-4"></i>
                         @if($cartCount > 0)
                             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger fs-6">
                                 {{ $cartCount }}
@@ -44,15 +66,21 @@
                 </div>
             </div>
 
-            <a href="{{ route('profile.edit') }}" class="d-flex align-items-center justify-content-center" style="border: 1px solid #000000; border-radius: 5px; padding: 10px; width: 135px; height: 52px; text-decoration: none; color: #000;">
-                <div class="d-flex align-items-center" style="gap: 9px;">
-                    <span>Profile</span>
-                    <img src="{{ asset(Auth::user()->customerProfile?->avatar_path ?? 'images/logo foto profile.png') }}" alt="Profile" style="width: 32px; height: 32px; border-radius: 50%;">
-                </div>
+            {{-- Frame 18: Profil Button --}}
+            <a href="{{ route('profile.edit') }}" style="border: 1px solid #000; border-radius: 5px; padding: 10px 15px; color: #000; text-decoration: none;">
+                <span>Profile</span>
+                <img src="{{ asset(Auth::user()->customerProfile->avatar_path ?? 'images/pp.png') }}" alt="Profile" width="32" height="32" style="border-radius:50%;margin-left:9px;">
             </a>
         </div>
     </div>
 @endsection
+@foreach (['success', 'error', 'warning', 'info'] as $type)
+    @if (session($type))
+        <div class="alert alert-{{ $type == 'error' ? 'danger' : $type }}">
+            {{ session($type) }}
+        </div>
+    @endif
+@endforeach
 <div class="container my-5">
     <h2 class="text-center fw-bold mb-5" style="font-family:'Chakra Petch',sans-serif;font-size:42px;">
         🛒 My Shopping Cart
@@ -65,17 +93,55 @@
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
                         @foreach ($cart->items as $item)
-                            <div class="row align-items-center border-bottom py-3">
+                            {{-- Tambahkan kondisi stok habis --}}
+                            @php
+                                $out_of_stock = ($item->product->stock ?? 0) <= 0;
+                            @endphp
+
+                            <div class="row align-items-center border-bottom py-3 {{ $out_of_stock ? 'opacity-50' : '' }}">
                                 {{-- Product Image --}}
                                 <div class="col-3 col-md-2">
-                                    <img src="{{ asset('storage/' . ($item->product->images ?? 'no-image.png')) }}" 
-                                         class="img-fluid rounded border" alt="{{ $item->product->name }}">
+                                    <img src="{{ asset('storage/' . ($item->product->images[0] ?? 'no-image.png')) }}"
+                                        class="img-fluid rounded border" alt="{{ $item->product->name }}">
                                 </div>
 
                                 {{-- Product Info --}}
                                 <div class="col-md-4">
-                                    <h5 class="mb-1 fw-bold">{{ $item->product->name }}</h5>
-                                    <p class="text-primary mb-0">Rp{{ number_format($item->price, 0, ',', '.') }}</p>
+                                    <div style="display:flex;flex-direction:column;gap:6px;">
+                                        <h5 class="fw-bold mb-1" style="font-family:'Chakra Petch',sans-serif;font-size:18px;color:#000;">
+                                            {{ $item->product->name }}
+                                            @if($item->meta && ($item->meta['type'] ?? null) === 'bundle')
+                                                <span class="badge bg-warning text-dark ms-1" style="font-size:12px;padding:5px 10px;border-radius:6px;">Bundle</span>
+                                            @endif
+                                        </h5>
+
+                                        {{-- Harga --}}
+                                        <p class="mb-1" style="color:#0d6efd;font-weight:600;">
+                                            Rp{{ number_format($item->price, 0, ',', '.') }}
+                                        </p>
+
+                                        {{-- Info stok habis --}}
+                                        @if($out_of_stock)
+                                            <small class="text-danger d-block mt-1" style="font-weight:500;">
+                                                Out of Stock
+                                            </small>
+                                        @endif
+
+                                        {{-- Isi Bundle --}}
+                                        @if($item->meta && ($item->meta['type'] ?? null) === 'bundle')
+                                            <div style="background:#fff8e1;border:1px solid #ffe58f;border-radius:8px;padding:10px 12px;margin-top:5px;">
+                                                <p class="mb-2" style="font-weight:600;color:#6c757d;font-size:13px;">Included in this bundle:</p>
+                                                <ul class="mb-0 ps-3" style="font-size:13px;color:#555;list-style-type:disc;">
+                                                    @foreach($item->meta['items'] as $bundleItem)
+                                                        <li style="margin-bottom:3px;">
+                                                            {{ $bundleItem['name'] }}
+                                                            <span style="color:#777;">× {{ $bundleItem['qty'] * $item->qty }}</span>
+                                                        </li>
+                                                    @endforeach
+                                                </ul>
+                                            </div>
+                                        @endif
+                                    </div>
                                 </div>
 
                                 {{-- Quantity Update --}}
@@ -83,7 +149,7 @@
                                     <form action="{{ route('cart.update', $item->id) }}" method="POST" class="d-flex align-items-center gap-2">
                                         @csrf
                                         @method('PUT')
-                                        <input type="number" name="qty" value="{{ $item->qty }}" min="1" class="form-control text-center" style="max-width: 80px;">
+                                        <input type="number" name="qty" value="{{ $item->qty }}" min="1" class="form-control text-center" style="max-width:80px;">
                                         <button type="submit" class="btn btn-primary btn-sm">Update</button>
                                     </form>
                                 </div>
@@ -108,6 +174,7 @@
                     </div>
                 </div>
             </div>
+
 
             {{-- CART SUMMARY --}}
             <div class="col-lg-4">

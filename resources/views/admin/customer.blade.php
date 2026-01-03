@@ -82,6 +82,7 @@
               <a class="nav-link" href="{{ route('admin.products.index') }}"><i class="bi bi-box"></i>Products</a>
               <a class="nav-link" href="{{ route('admin.shipping.index') }}"><i class="bi bi-truck"></i>Shipping Settings</a>
               <a class="nav-link" href="{{ route('admin.workshops.index') }}"><i class="bi bi-calendar-event"></i>Workshops & Seminars</a>
+
             </nav>
         </div>
 
@@ -153,7 +154,7 @@
                       </td>
                       <td class="fw-bold">{{ $c->name }}</td>
                       <td>{{ $c->email ?? '-' }}</td>
-                      <td>{{ $c->customerProfile?->phone ?? '-' }}</td>
+                      <td>{{ $c->customerProfile->phone ?? '-' }}</td>
                       <td>{{ $c->created_at->format('d M Y') }}</td>
                       <td>
                           <span class="badge-status {{ strtolower($c->status) }}">

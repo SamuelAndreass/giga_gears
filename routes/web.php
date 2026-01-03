@@ -13,7 +13,6 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\SeminarController;
 
-
 Route::middleware('guest')->group(function () {
     Route::get('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/login', [\App\Http\Controllers\Auth\AuthenticatedSessionController::class, 'store']);
@@ -65,6 +64,7 @@ Route::middleware(['auth', 'ensure.active'])->group(function(){
     Route::post('/buy-now/redirect', [CartController::class, 'buyNowRedirect'])->name('buy_now.redirect');
     Route::post('/buy-now/immediate', [CartController::class, 'buyNowImmediate'])->name('buy_now.immediate');
 });
+
 Route::middleware(['auth', 'ensure.active','redirect.seller'])->group(function(){
     Route::view('/become-seller', 'seller.seller-setup-store')->name('become.seller.page');
     Route::post('/become-seller/store', [SellerController::class, 'store'])->name('become.seller');
@@ -92,10 +92,12 @@ Route::middleware(['auth','ensure.seller', 'ensure.active', 'store.active'])->pr
     Route::put('settings/password', [SettingsController::class, 'updatePassword'])->name('settings.password.update');
     Route::get('/seller/orders-over-time/data', [SellerController::class, 'data'])->name('seller.orders-over-time.data');
     Route::delete('settings/store', [SettingsController::class, 'destroyStore'])->name('settings.store.destroy');
-
-
+    Route::get('/bundles/create', [SellerController::class, 'createBundle'])->name('seller.view.add.bundle');
+    Route::post('/bundles/store', [SellerController::class, 'storeBundle'])->name('seller.bundles.store');
+    Route::get('/products/{id}', [SellerController::class, 'show'])->name('seller.products.show');
+    Route::delete('/seller/products/{product}', [SellerController::class, 'destroy'])->name('seller.products.destroy');
+    Route::put('/products/{product}/quick-update', [SellerController::class, 'quickUpdate'])->name('seller.products.quick-update');
 });
-
 
 
 // admin

@@ -22,6 +22,7 @@ class BundleProductSeeder extends Seeder
 
 
         $products = Product::where('seller_store_id', $store->id)
+            ->where('type', '!=', 'bundle')
             ->get();
 
         if ($products->count() < 3) {
@@ -38,8 +39,9 @@ class BundleProductSeeder extends Seeder
             $bundle = Product::create([
                 'seller_store_id' => $store->id,
                 'name' => 'Gaming Starter Pack',
+                'type' => 'bundle',
+                'price' => 4299000,
                 'original_price' => 4797000, 
-                'discount_price' => 4299000,
                 'stock' => 1,
                 'brand' => 'Bundle Deal',
                 'status' => 'active',
@@ -80,8 +82,10 @@ class BundleProductSeeder extends Seeder
             $bundle = Product::create([
                 'seller_store_id' => $store->id,
                 'name' => 'Work From Home Pro Pack',
+                'type' => 'bundle',
+
+                'price' => 23500000,
                 'original_price' => 23898000,
-                'discount_price' => 23500000,
                 'stock' => 1,
                 'brand' => 'WFH Bundle',
                 'status' => 'active',

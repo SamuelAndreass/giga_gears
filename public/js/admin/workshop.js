@@ -2,6 +2,8 @@ document.addEventListener('DOMContentLoaded', function() {
     setupSidebar();
     setupSearch();
     setupModalReset();
+    setupFormValidation();
+    syncEndDateMin();
 });
 
 function setupSidebar() {
@@ -58,6 +60,48 @@ function resetForm() {
         form.action = '/admin/workshops';
     }
 }
+
+function setupFormValidation() {
+    const form = document.getElementById('workshopForm');
+    if (!form) return;
+
+    form.addEventListener('submit', function (e) {
+        const startDate = document.getElementById('start_date').value;
+        const startTime = document.getElementById('start_time').value;
+        const endDate   = document.getElementById('end_date').value;
+        const endTime   = document.getElementById('end_time').value;
+        const capacity  = document.getElementById('capacity').value;
+
+        if (!startDate || !startTime || !endDate || !endTime) return;
+
+        const start = new Date(`${startDate}T${startTime}`);
+        const end   = new Date(`${endDate}T${endTime}`);
+
+        if (end <= start) {
+            e.preventDefault();
+            alert('❌ End date & time harus setelah start date & time');
+            return;
+        }
+
+        if (parseInt(capacity) < 1) {
+            e.preventDefault();
+            alert('❌ Capacity minimal 1');
+            return;
+        }
+    });
+}
+
+function syncEndDateMin() {
+    const startDate = document.getElementById('start_date');
+    const endDate = document.getElementById('end_date');
+
+    if (!startDate || !endDate) return;
+
+    startDate.addEventListener('change', function () {
+        endDate.min = this.value;
+    });
+}
+
 
 function editWorkshop(workshopId) {
     // Fetch dengan credentials included

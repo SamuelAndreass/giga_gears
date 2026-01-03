@@ -173,33 +173,34 @@
             <section class="gg-card p-3 p-md-4">
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <div class="fw-semibold">Customer Growth</div>
-                @if(empty($customerData) || count(array_filter($customerData)) === 0)
-                  <div class="text-muted small">No customer data available.</div>
-                @else
+                  @if($customer_growth->isEmpty())
+                    <div class="text-muted small">No customer data available.</div>
+                  @else
                   <div class="btn-group btn-group-sm">
                     <button class="btn btn-outline-secondary disabled">This Year</button>
                   </div>
-                @endif
-              </div>
+                </div>
               <div style="height: 240px;">
                   <canvas id="customerChart" height="120"></canvas>
               </div>
+              
             </section>
+                  @endif
           </div>
           <div class="col-12 col-xl-4">
             <section class="gg-card p-3 p-md-4">
               <div class="fw-semibold mb-2">Revenue by Category</div>
-              @if(empty($labels) || count($labels) === 0)
-                <p class="text-center text-muted small mt-3 mb-0">No revenue data available.</p>
-              @else
                 <canvas id="revenueChart" height="50"></canvas>
-                <ul class="mt-3 mb-0 small">
-                  @foreach ($revenues as $rvn)
-                    <li><span style="display:inline-block;width:10px;height:10px;background:var(--pie-{{ $loop->index + 1 }});border-radius:3px;margin-right:8px"></span>{{ $rvn->category_name }} — {{ $percentages[$loop->index] }}%</li>
-                  @endforeach
-                </ul>
-              @endif
+                  @if($revenues->isEmpty())
+                    <p class="text-center text-muted small mt-3 mb-0">No revenue data available.</p>
+                  @else
+                    <ul class="mt-3 mb-0 small">
+                      @foreach ($revenues as $rvn)
+                        <li><span style="display:inline-block;width:10px;height:10px;background:var(--pie-{{ $loop->index + 1 }});border-radius:3px;margin-right:8px"></span>{{ $rvn->category_name }} — {{ $percentages[$loop->index] }}%</li>
+                      @endforeach
+                    </ul>
             </section>
+                  @endif
           </div>
         </div>
 

@@ -16,12 +16,11 @@ use Exception;
 class CheckoutController extends Controller
 {
 
-    
     public function showCheckoutPage(Request $request)
     {
         $user = $request->user();
 
-        $cart = Cart::with('items.product')
+        $cart = Cart::with('items.product.bundleItems.product')
                     ->where('user_id', $user->id)
                     ->where('status', 'active')
                     ->first();
@@ -32,7 +31,7 @@ class CheckoutController extends Controller
 
         $subTotal = 0;
         foreach ($cart->items as $ci) {
-            $subTotal += $ci->subtotal;
+            $subTotal += ($ci->price * $ci->qty);
         }
         
         $shippings = Shipping::where('status', 'active')->get();
@@ -94,7 +93,7 @@ class CheckoutController extends Controller
                 return response()->json(['order' => $existing], 200);
             }
 
-            $cart = Cart::with('items.product')
+            $cart = Cart::with('items.product.bundleItems.product')
                         ->where('user_id', $user->id)
                         ->where('status', 'active')
                         ->first();
@@ -106,13 +105,21 @@ class CheckoutController extends Controller
                 return response()->json(['message' => 'Cart is empty'], 400);
             }
 
+            $cart = $this->revalidateCart($cart);
+
+            if ($cart->items->isEmpty()) {
+                return redirect()->route('cart.index')
+                    ->with('error', 'Semua item di cart sudah habis stok');
+            }
+
+
             $subtotal = 0;
             foreach ($cart->items as $ci) {
 
                 if (! $ci->product) {
                     throw new Exception("Cart item product missing (id: {$ci->product_id})");
                 }
-                $subtotal += ($ci->product->original_price * $ci->qty);
+                $subtotal = $cart->items->sum(fn ($ci) => $ci->price * $ci->qty);
             }
 
 
@@ -146,33 +153,38 @@ class CheckoutController extends Controller
 
             foreach ($cart->items as $ci) {
 
-                $product = Product::lockForUpdate()->find($ci->product_id);
-                if (! $product) {
-                    throw new Exception("Product not found (id: {$ci->product_id})");
-                }
-                if ($product->stock < $ci->qty) {
-                    throw new Exception("Insufficient stock for product: {$product->name}");
-                }
+                $product = Product::lockForUpdate()->with('bundleItems.product')->find($ci->product_id);
 
-                $unitPrice = $product->original_price;
-                $lineSubtotal = $unitPrice * $ci->qty;
+                if (! $product) {
+                    continue;
+                }
 
                 OrderItem::create([
                     'order_id' => $order->id,
                     'product_id' => $product->id,
                     'qty' => $ci->qty,
                     'sku' => $product->sku ?? null,
-                    'price' => $unitPrice,
-                    'subtotal' => $lineSubtotal,
+                    'price' => $ci->price,
+                    'subtotal' => $ci->subtotal,
+                    'meta' => $ci->meta,
                 ]);
 
-                $product->decrement('stock', $ci->qty);
+                if ($product->type === 'bundle') {
+                    foreach ($product->bundleItems as $bundleItem) {
+                        $bundleItem->product->decrement(
+                            'stock',
+                            $bundleItem->quantity * $ci->qty
+                        );
+                    }
+                } else {
+                    $product->decrement('stock', $ci->qty);
+                }
             }
 
 
             $cart->update(['status' => 'checked_out']);
-            $cart->items()->delete();
 
+            
             DB::commit();
 
             if (! $request->wantsJson()) {
@@ -196,5 +208,61 @@ class CheckoutController extends Controller
         }
     }
 
+    private function validateBundleStock(Product $bundle, int $qty)
+    {
+        foreach ($bundle->bundleItems as $item) {
+
+            if (! $item->product) {
+                throw new Exception("Produk bundle tidak valid");
+            }
+
+            $needed = $item->quantity * $qty;
+
+            if ($item->product->stock < $needed) {
+                throw new Exception("Stok {$item->product->name} tidak mencukupi");
+            }
+        }
+    }
+
+    private function revalidateCart(Cart $cart): Cart
+    {
+        foreach ($cart->items as $item) {
+
+            $product = $item->product;
+
+            if (! $product) {
+                $item->delete();
+                continue;
+            }
+
+            if ($product->type === 'bundle') {
+                $invalid = false;
+                foreach ($product->bundleItems as $bi) {
+                    if ($bi->product->stock < ($bi->quantity * $item->qty)) {
+                        $invalid = true;
+                        break;
+                    }
+                }
+                if ($invalid) {
+                    $item->delete();
+                }
+            }
+            
+            else {
+                if ($product->stock < $item->qty) {
+                    $item->delete();
+                }
+            }
+        }
+
+        $cart->refresh();
+
+        $cart->update([
+            'total_price' => $cart->items->sum(fn ($i) => $i->price * $i->qty)
+        ]);
+
+        return $cart;
+    }
+    
 
 }

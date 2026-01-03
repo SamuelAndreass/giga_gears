@@ -21,23 +21,61 @@
                         <h4 class="fw-bold mb-3">Your Items</h4>
 
                         @foreach ($cart->items as $item)
-                            <div class="d-flex justify-content-between align-items-center border-bottom py-3">
-                                <div class="d-flex align-items-center">
-                                    <img src="{{ asset('storage/' . ($item->product->images ?? 'no-image.png')) }}" 
-                                         alt="{{ $item->product->name }}" 
-                                         class="rounded border me-3" style="width: 70px; height: 70px; object-fit: contain;">
+                            <div class="d-flex justify-content-between align-items-start border-bottom py-3">
+
+                                {{-- LEFT: IMAGE + INFO --}}
+                                <div class="d-flex align-items-start">
+                                    @php
+                                        $imagePath = is_array($item->product->images) && count($item->product->images) > 0
+                                            ? $item->product->images[0]
+                                            : 'no-image.png';
+                                    @endphp
+
+                                    <img src="{{ asset('storage/' . $imagePath) }}"
+                                        alt="{{ $item->product->name }}"
+                                        class="rounded border me-3"
+                                        style="width:70px;height:70px;object-fit:contain;">
+
                                     <div>
-                                        <h6 class="fw-bold mb-1">{{ $item->product->name }}</h6>
-                                        <small class="text-muted">Qty: {{ $item->qty }}</small>
+                                        {{-- PRODUCT NAME --}}
+                                        <h6 class="fw-bold mb-1">
+                                            {{ $item->product->name }}
+
+                                            {{-- BADGE BUNDLE --}}
+                                            @if($item->meta && ($item->meta['type'] ?? null) === 'bundle')
+                                                <span class="badge bg-warning text-dark ms-1">Bundle</span>
+                                            @endif
+                                        </h6>
+
+                                        {{-- QTY --}}
+                                        <small class="text-muted d-block">
+                                            Qty: {{ $item->qty }}
+                                        </small>
+
+                                        {{-- ISI BUNDLE (READ ONLY) --}}
+                                        @if($item->meta && ($item->meta['type'] ?? null) === 'bundle')
+                                            <ul class="small text-muted ps-3 mb-0 mt-1">
+                                                @foreach($item->meta['items'] as $bundleItem)
+                                                    <li>
+                                                        {{ $bundleItem['name'] }}
+                                                        × {{ $bundleItem['qty'] * $item->qty }}
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        @endif
                                     </div>
                                 </div>
+
+                                {{-- RIGHT: SUBTOTAL --}}
                                 <div class="text-end">
                                     <h6 class="fw-bold mb-0 text-primary">
                                         Rp{{ number_format($item->subtotal, 0, ',', '.') }}
                                     </h6>
                                 </div>
+
                             </div>
                         @endforeach
+
                     </div>
                 </div>
 

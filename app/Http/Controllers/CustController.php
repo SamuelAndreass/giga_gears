@@ -137,7 +137,7 @@ class CustController extends Controller
         $perPage = (int) $request->query('per_page', default: 8);
         $perPage = $perPage > 0 && $perPage <= 100 ? $perPage : 12;
 
-        $query = Product::with('category')->where('status', 'active');
+        $query = Product::with('category')->where('status', 'active')->where( 'stock', '>', 0)->where('type', 'single');
 
         if ($search !== '') {
             $query->where(function ($q) use ($search) {
@@ -176,7 +176,7 @@ class CustController extends Controller
         return back()->with('message', 'Order cancelled successfully.');
     }
 
-    public function showProd($id = 1)
+    public function showProd($id)
     {
         $detailProduct = Product::findOrFail($id);
 

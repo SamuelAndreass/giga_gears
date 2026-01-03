@@ -40,7 +40,7 @@ class CategoryProductSeeder extends Seeder
     public function run()
     {
         $categories = [
-            'Smartphone', 'Laptop', 'Accessories', 'Gaming', 'Mac', 'Software'
+            'Smartphone', 'Laptop', 'Accessories', 'Gaming', 'Mac', 'Software','Books'
         ];
 
         foreach ($categories as $catName) {
@@ -233,7 +233,70 @@ class CategoryProductSeeder extends Seeder
                     'duration' => '12 months',
                     'license' => '1 user',
                 ],
+            ],[
+                'name' => 'Belajar Python Dasar untuk Pemula',
+                'category' => 'Books',
+                'price_idr' => 125000,
+                'stock' => 50,
+                'image' => 'images/sample/python book.jpg',
+                'specs' => [
+                    'author' => 'Andi Wijaya',
+                    'publisher' => 'Informatika Press',
+                    'pages' => 320,
+                    'language' => 'Indonesia',
+                    'level' => 'Beginner',
+                    'format' => 'Softcover',
+                ],
             ],
+            [
+                'name' => 'Python Lanjutan: Data Science & Machine Learning',
+                'category' => 'Books',
+                'price_idr' => 185000,
+                'stock' => 35,
+                'image' => 'images/sample/python book.jpg',
+                'specs' => [
+                    'author' => 'Budi Santoso',
+                    'publisher' => 'Tech Media',
+                    'pages' => 420,
+                    'language' => 'Indonesia',
+                    'level' => 'Intermediate',
+                    'topic' => 'Data Science, Machine Learning',
+                    'format' => 'Softcover',
+                ],
+            ],
+            [
+                'name' => 'Laravel 10 From Zero to Hero',
+                'category' => 'Books',
+                'price_idr' => 199000,
+                'stock' => 40,
+                'image' => 'images/sample/belajar-laravel-10-scaled.jpg',
+                'specs' => [
+                    'author' => 'Rizky Pratama',
+                    'publisher' => 'Web Dev Publishing',
+                    'pages' => 380,
+                    'language' => 'Indonesia',
+                    'framework' => 'Laravel 10',
+                    'level' => 'Beginner - Intermediate',
+                    'format' => 'Softcover',
+                ],
+            ],
+            [
+                'name' => 'Algoritma & Struktur Data dengan Python',
+                'category' => 'Books',
+                'price_idr' => 175000,
+                'stock' => 30,
+                'image' => 'images/sample/python book.jpg',
+                'specs' => [
+                    'author' => 'Dewi Lestari',
+                    'publisher' => 'EduCode',
+                    'pages' => 410,
+                    'language' => 'Indonesia',
+                    'topic' => 'Algorithms, Data Structure',
+                    'level' => 'Intermediate',
+                    'format' => 'Softcover',
+                ],
+            ],
+
         ];
 
         foreach ($samples as $s) {
@@ -261,9 +324,8 @@ class CategoryProductSeeder extends Seeder
                 'seller_store_id' => $store->id,
                 'category_id' => $cat->id,
                 'name' => $s['name'],
-
                 'description' => $s['name'] . ' — produk demo. Stok: ' . $s['stock'],
-                'original_price' => $s['price_idr'],
+                'price' => $s['price_idr'],
                 'discount_price' => 0,
                 'discount_percentage' => 0,
                 'stock' => $s['stock'],

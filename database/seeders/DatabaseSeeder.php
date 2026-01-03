@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,8 +16,8 @@ class DatabaseSeeder extends Seeder
             CartSeeder::class,
             OrderSeeder::class,
             ForumSeeder::class,
-            SeminarSeeder::class,
             BundleProductSeeder::class,
+            SeminarSeeder::class,
         ]);
     }
 }

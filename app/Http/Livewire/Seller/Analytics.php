@@ -58,7 +58,7 @@ class OrdersOverTime extends Component
             ->where('p.seller_store_id', $storeId)
             ->whereBetween('o.order_date', [$start, $end])
             ->whereIn('o.status', ['paid','processing','completed','delivered'])
-            ->selectRaw('EXTRACT(DAY FROM o.order_date)::integer as day, COUNT(DISTINCT o.id) as total')
+            ->selectRaw('DAY(o.order_date) as day, COUNT(DISTINCT o.id) as total')
             ->groupBy('day')
             ->pluck('total','day')
             ->toArray();
