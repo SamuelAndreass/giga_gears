@@ -47,7 +47,7 @@
             
             {{-- Frame 16: Links --}}
             <div class="d-flex" style="gap: 71px; font-size:25px">
-                <div class="d-flex gap-3">
+                <div class="d-flex gap-4">
                     <a href="{{ route('dashboard') }}" style="color: #000000; text-decoration: none;">Home</a>
                     <a href="{{ route('products.index') }}" style="color: #067CC2; text-decoration: none;">Products</a>
                     <a href="/#about-us-section" style="color: #000000; text-decoration: none;">About Us</a>

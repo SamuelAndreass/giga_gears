@@ -19,7 +19,7 @@
         <div class="page-container main-navbar">
             <img src="{{ asset('images/logo GigaGears.png') }}" alt="GIGAGEARS Logo" width="197" height="24">
             <div class="d-flex" style="gap: 71px;">
-                <div class="d-flex gap-3">
+                <div class="d-flex gap-4">
                     <a href="{{ route('dashboard') }}" style="color: #000; font-size:25px; text-decoration:none;">Home</a>
                     <a href="{{ route('products.index') }}" style="color: #000; font-size:25px; text-decoration:none;">Products</a>
                     <a href="/#about-us-section" style="color: #000; font-size:25px; text-decoration:none;">About Us</a>

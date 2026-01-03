@@ -119,6 +119,7 @@
           <a class="nav-link" href="{{ route('admin.transactions.index') }}"><i class="bi bi-receipt"></i>Data Transaction</a>
           <a class="nav-link" href="{{ route('admin.products.index') }}"><i class="bi bi-box"></i>Products</a>
           <a class="nav-link active" href="{{ route('admin.shipping.index') }}"><i class="bi bi-truck"></i>Shipping Settings</a>
+          <a class="nav-link" href="{{ route('admin.workshops.index') }}"><i class="bi bi-calendar-event"></i>Workshops & Seminars</a>
         </nav>
 
         <div class="mt-auto pb-4 px-3 pt-3 border-top">

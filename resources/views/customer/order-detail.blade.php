@@ -42,12 +42,24 @@
             
             {{-- Frame 16: Links --}}
             <div class="d-flex" style="gap: 71px; font-size:25px">
-                <div class="d-flex gap-5">
+                <div class="d-flex gap-4">
                     <a href="{{ route('dashboard') }}" style="color: #000000; text-decoration: none;">Home</a>
                     <a href="{{ route('products.index') }}" style="color: #000000; text-decoration: none;">Products</a>
                     <a href="/#about-us-section" style="color: #000000; text-decoration: none;">About Us</a>
                     <a href="{{ route('orders.index') }}" style="color: #067CC2; text-decoration: none;">My Order</a>
                     <a href="{{ route('community.index') }}" style="color: #000000; text-decoration: none;">Communities</a>
+                    <a href="{{ route('seminar.index') }}" style="color: #000000; text-decoration: none;">Seminar</a>
+                    @auth
+                    <a href="{{ route('cart.index') }}" 
+                        class="position-relative text-decoration-none text-dark" style="white-space: nowrap;">
+                        <i class="bi bi-cart3"></i>
+                        @if($cartCount > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger fs-6">
+                                {{ $cartCount }}
+                            </span>
+                        @endif
+                    </a>
+                    @endauth
                 </div>
             </div>
 

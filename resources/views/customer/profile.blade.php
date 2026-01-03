@@ -27,13 +27,14 @@
             <img src="{{ asset('images/logo GigaGears.png') }}" alt="GIGAGEARS Logo" width="197" height="24">
             
             <div class="d-flex" style="gap: 71px;">
-                <div class="d-flex gap-5">
+                <div class="d-flex gap-4">
                     <a href="{{ route('dashboard') }}" style="color: #000000; font-size:25px; text-decoration: none;">Home</a>
                     <a href="{{ route('products.index') }}" style="color: #000000; font-size:25px; text-decoration: none;">Products</a>
                     <a href="/about-us" style="color: #000000; font-size:25px; text-decoration: none;">About Us</a>
                     <a href="{{ route('orders.index') }}" style="color: #000000; font-size:25px; text-decoration: none;">My Order</a>
                     <a href="{{ route('community.index') }}" style="color: #000000; font-size:25px; text-decoration: none;">Communities</a>
-                                        <a href="{{ route('cart.index') }}" 
+                    <a href="{{ route('seminar.index') }}" style="color: #000000; font-size:25px; text-decoration: none;">Seminar</a>
+                    <a href="{{ route('cart.index') }}" 
                         class="position-relative text-decoration-none 
                         {{ request()->routeIs('cart.index') ? 'text-primary fw-bold' : 'text-dark' }}">
                         <i class="bi bi-cart3 fs-4"></i>

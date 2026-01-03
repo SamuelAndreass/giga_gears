@@ -66,7 +66,7 @@
         <div class="page-container main-navbar d-flex justify-content-between align-items-center mx-auto">
             <img src="{{ asset('images/logo GigaGears.png') }}" alt="GIGAGEARS Logo" width="197">
             <div class="d-flex" style="gap: 45px; font-size:22px; align-items: center;">
-                <div class="d-flex gap-3">
+                <div class="d-flex gap-4">
                     <a href="{{ route('dashboard') }}" style="color: #067CC2; text-decoration: none; white-space: nowrap;">Home</a>
                     <a href="{{ route('products.index') }}" style="color: #000000; text-decoration: none; white-space: nowrap;">Products</a>
                     <a href="/#about-us-section" style="color: #000000; text-decoration: none; white-space: nowrap;">About Us</a>
