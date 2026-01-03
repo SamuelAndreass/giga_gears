@@ -29,17 +29,6 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-    protected static function booted()
-    {
-        static::created(function ($user) {
-            if ($user->role === 'customer') {
-                CustomerProfile::create([
-                    'user_id' => $user->id,
-                    'phone' => $user->phone,
-                ]);
-            }
-        });
-    }
 
     public function scopeActive($q) {
         return $q->where('status','active')

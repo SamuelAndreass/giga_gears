@@ -139,19 +139,30 @@
                 @foreach ($products as $p)
                   <tr>
                       {{-- PRODUCT NAME + ID --}}
-                      <td>
-                          <div class="d-flex align-items-center gap-3">
-                              <div class="product-thumb"><i class="bi bi-box-seam"></i></div>
-                              <div>
-                                  <div class="fw-bold text-dark">
-                                      {{ $p->name }}
-                                  </div>
-                                  <div class="small text-muted">
-                                      ID: {{ $p->id }}
-                                  </div>
-                              </div>
-                          </div>
-                      </td>
+                     <td>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="product-thumb">
+                                <i class="bi bi-box-seam"></i>
+                            </div>
+
+                            <div>
+                                <div class="fw-bold text-dark d-flex align-items-center gap-2">
+                                    {{ $p->name }}
+
+                                    @if ($p->type === 'bundle')
+                                        <span class="badge bg-warning text-dark small">
+                                            BUNDLE
+                                        </span>
+                                    @endif
+                                </div>
+
+                                <div class="small text-muted">
+                                    ID: {{ $p->id }}
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+
 
                       {{-- CATEGORY --}}
                       <td>
@@ -169,8 +180,9 @@
 
                       {{-- PRICE --}}
                       <td class="fw-bold">
-                          Rp{{ number_format($p->original_price, 0, ',', '.') }}
+                              Rp{{ number_format($p->price, 0, ',', '.') }}
                       </td>
+
 
                       {{-- STOCK --}}
                       <td class="text-center">
@@ -254,7 +266,7 @@
                     <div class="badge bg-primary mb-2" id="vm-cat">Category</div>
                     <h4 class="fw-bold mb-1" id="vm-name">Product Name</h4>
                     <div class="text-muted small mb-3">SKU: <span id="vm-sku">PRD-000</span></div>
-                    <h3 class="fw-bold text-primary mb-3" id="vm-price">$0.00</h3>
+                    <h3 class="fw-bold text-primary mb-3" id="vm-price">Rp.0.00</h3>
                     <div class="row g-3 mb-3">
                         <div class="col-6"><label class="small text-muted fw-bold">SELLER</label><div id="vm-seller" class="fw-semibold">Seller Name</div></div>
                         <div class="col-6"><label class="small text-muted fw-bold">STOCK</label><div id="vm-stock" class="fw-semibold">0 Units</div></div>
@@ -301,7 +313,7 @@
 
                 // IMAGE
                 if (p.image) {
-                    document.querySelector('#vm-img').style.backgroundImage = `url('${p.image}')`;
+                    document.querySelector('#vm-img').style.backgroundImage = `url('/storage/${p.image}')`;
                     document.querySelector('#vm-img i').style.display = 'none';
                 } else {
                     document.querySelector('#vm-img').style.backgroundImage = 'none';
@@ -312,7 +324,16 @@
                 document.querySelector('#vm-name').textContent = p.name;
                 document.querySelector('#vm-sku').textContent = p.sku;
                 document.querySelector('#vm-cat').textContent = p.category;
-                document.querySelector('#vm-price').textContent = "Rp" + Number(p.price).toLocaleString('id-ID');
+                let priceText = '';
+
+                if (p.is_bundle) {
+                    priceText = "Rp" + Number(p.discount_price).toLocaleString('id-ID');
+                } else {
+                    priceText = "Rp" + Number(p.price).toLocaleString('id-ID');
+                }
+
+                document.querySelector('#vm-price').textContent = priceText;
+
                 document.querySelector('#vm-stock').textContent = p.stock + " Units";
                 document.querySelector('#vm-seller').textContent = p.seller;
                 document.querySelector('#vm-status').textContent = p.status.slice(0,1).toUpperCase() + p.status.slice(1);

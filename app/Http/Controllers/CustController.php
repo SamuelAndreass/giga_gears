@@ -167,7 +167,7 @@ class CustController extends Controller
 
         $order = Order::where('id', $id)
             ->where('user_id', $userId)
-            ->whereIn('status', ['Processing', 'Shipped'])
+            ->whereIn('status', ['processing', 'pending'])
             ->firstOrFail();
 
         $order->status = 'Cancelled';

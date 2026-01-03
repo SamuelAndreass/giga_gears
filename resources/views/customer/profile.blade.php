@@ -60,6 +60,12 @@
 {{-- 2. KONTEN UTAMA (@section('content')) --}}
 {{-- ================================================= --}}
 @section('content')    
+    @session('success')
+        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endsession
     {{-- Title & Log Out --}}
     <div class="d-flex justify-content-between align-items-center" style="width: 100%; margin-top: 50px; margin-bottom: 30px;">
         <div>
@@ -142,7 +148,7 @@
 
                     <div class="mb-3">
                         <label class="form-label">Phone</label>
-                        <input name="phone" id="profile_phone" type="text" class="form-control" value="{{ old('phone', $user->phone) }}" placeholder="{{ $user->phone ?? 'Enter your phone number' }}">
+                        <input name="phone" id="profile_phone" type="text" class="form-control" value="{{ old('phone', $cprofile->phone) }}" placeholder="{{ $user->phone ?? 'Enter your phone number' }}">
                         <div class="invalid-feedback" id="error-phone"></div>
                     </div>
                 </div>

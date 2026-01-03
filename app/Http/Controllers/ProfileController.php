@@ -57,27 +57,33 @@ class ProfileController extends Controller
 
         $data = $validator->validated();
 
-        DB::transaction(function () use ($user, $data) {
+        DB::transaction(function () use ($user, $request, $data) {
 
             $user->update([
                 'name'  => $data['name'],
                 'email' => $data['email'],
             ]);
 
+            $profileData = [
+                'address' => $data['address'] ?? $user->customerProfile?->address,
+            ];
+
+            if ($request->filled('phone')) {
+                $profileData['phone'] = $data['phone'];
+            }
+
             $user->customerProfile()->updateOrCreate(
                 ['user_id' => $user->id],
-                [
-                    'phone'   => $data['phone']   ?? null,
-                    'address' => $data['address'] ?? null,
-                ]
+                $profileData
             );
         });
+
 
         if ($request->expectsJson()) {
             return response()->json(['status' => 'ok']);
         }
 
-        return back()->with('status', 'profile-updated');
+        return back()->with('success', 'profile-updated');
     }
 
     public function updatePassword(Request $request): RedirectResponse
@@ -105,7 +111,7 @@ class ProfileController extends Controller
         ]);
 
 
-        return back()->with('status', 'password-updated');
+        return back()->with('success', 'password-updated');
     }
 
     public function updateAddress(Request $request): RedirectResponse

@@ -45,7 +45,6 @@ Route::middleware(['auth', 'ensure.active'])->group(function(){
     Route::post('/profile/settings/profile', [ProfileController::class, 'updateProfile'])->name('profile.settings.profile.update');
     Route::post('/profile/settings/password', [ProfileController::class, 'updatePassword'])->name('profile.settings.password.update');
     Route::post('/profile/settings/address', [ProfileController::class, 'updateAddress'])->name('profile.settings.address.update');
-
     Route::view('/checkout', 'customer.checkout')->name('checkout');
     Route::get('/my-order', [CustController::class, 'myOrders'])->name('orders.index');
     Route::get('/orders/{order}', [CustController::class, 'show'])->name('orders.show');

@@ -184,6 +184,7 @@
                       {{-- STOCK --}}
                       <td class="text-center">
                           {{ $p->stock }}
+                          
                       </td>
 
                       {{-- STATUS --}}
